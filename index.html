@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Future Portfolio Challenge - Presenter</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  body { overflow-x: hidden; }
+  .bar { padding: 12px 28px; position: relative; z-index: 5; }
+  .bar .title { font-size: 18px; }
+  .bar .sp { flex: 1; }
+  .stage { padding: 32px 40px; min-height: calc(100vh - 72px); }
+  .screen { animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* Home */
+  .hero h1 { font-size: clamp(36px, 4.4vw, 64px); line-height: 1.08; font-weight: 600; }
+  .hero h1 em { font-style: normal; color: var(--gold); }
+  .hero p { font-size: 20px; color: var(--muted); max-width: 760px; margin: 14px 0 30px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+  .sc { text-align: left; background: var(--card); border-top: 4px solid var(--deep-red) !important; border: 1px solid var(--line); color: var(--text); border-radius: var(--radius); padding: 22px; transition: border-color .15s, transform .15s; display: flex; flex-direction: column; gap: 8px; min-height: 190px; }
+  .sc:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .sc .num { font-family: var(--condensed); color: var(--gold); font-weight: 500; font-size: 14px; letter-spacing: .1em; }
+  .sc h3 { font-size: 24px; }
+  .sc p { margin: 0; color: var(--muted); flex: 1; }
+  .sc .go { font-weight: 700; color: var(--gold); }
+  .sc.done { opacity: .55; }
+
+  /* Video */
+  .video-wrap { position: fixed; inset: 0; background: #000; z-index: 20; display: flex; align-items: center; justify-content: center; }
+  .video-wrap video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+  .video-ctrl { position: absolute; right: 24px; bottom: 24px; display: flex; gap: 10px; opacity: .25; transition: opacity .2s; }
+  .video-wrap:hover .video-ctrl { opacity: 1; }
+  .video-missing { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 30px; }
+  .video-missing h2 { font-size: 32px; margin-bottom: 10px; }
+
+  /* QR */
+  .qr-layout { display: grid; grid-template-columns: minmax(320px, 520px) 1fr; gap: 48px; align-items: center; }
+  .qr-card { background: var(--white); border-radius: 28px; padding: 28px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.35); border-top: 8px solid var(--deep-red); }
+  #qr { display: flex; justify-content: center; }
+  #qr img, #qr canvas { width: 100% !important; height: auto !important; max-width: 440px; }
+  .qr-card .url { color: var(--charcoal-navy); font-weight: 700; margin-top: 16px; word-break: break-all; font-size: 15px; }
+  .kick { font-family: var(--condensed); font-size: 16px; text-transform: uppercase; letter-spacing: .12em; color: var(--gold); font-weight: 500; }
+  .qr-info h1 { font-size: clamp(34px, 3.8vw, 58px); margin: 6px 0 10px; }
+  .qr-info .tag { font-size: 22px; color: var(--muted); margin: 0 0 26px; }
+  .steps { font-size: 22px; line-height: 1.7; margin: 0 0 26px; padding-left: 26px; }
+  .stats { display: flex; gap: 18px; margin-bottom: 22px; flex-wrap: wrap; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 22px; min-width: 170px; }
+  .stat .v { font-family: var(--display); font-size: 44px; font-weight: 700; }
+  .stat .l { color: var(--muted); font-size: 14px; }
+  .ticker { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; margin-bottom: 24px; }
+  .chip { background: var(--card-2); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-weight: 600; animation: pop .3s ease; }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  select { background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 10px 14px; font: inherit; }
+
+  /* Results */
+  .res-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 26px; flex-wrap: wrap; }
+  .res-head h1 { font-size: clamp(32px, 3.4vw, 52px); }
+  .res-layout { display: grid; grid-template-columns: minmax(320px, 0.85fr) 1.4fr; gap: 32px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+  .panel h2 { font-size: 20px; margin-bottom: 16px; }
+  .ret { display: grid; grid-template-columns: 150px 1fr 64px; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 15px; }
+  .ret .track { height: 18px; position: relative; }
+  .ret .track::before { content: ""; position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; background: var(--line); }
+  .ret .fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; animation: grow .8s ease both; }
+  @keyframes grow { from { transform: scaleX(0); } }
+  .ret .val { text-align: right; font-weight: 700; }
+  .lesson { margin-top: 18px; padding: 14px 16px; border-left: 4px solid var(--gold); background: var(--bg-2); border-radius: 10px; color: var(--muted); font-size: 16px; }
+  .lb-row { display: grid; grid-template-columns: 52px 1fr 150px 90px 28px; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; margin-bottom: 8px; background: var(--bg-2); position: relative; overflow: hidden; opacity: 0; animation: lbIn .5s ease forwards; }
+  @keyframes lbIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: none; } }
+  .lb-row .rk { font-family: var(--display); font-size: 26px; font-weight: 700; color: var(--muted); text-align: center; }
+  .lb-row.r1 { background: linear-gradient(90deg, rgba(119,18,27,.85), var(--bg-2)); border: 1px solid var(--anniversary-gold); }
+  .lb-row.r1 .rk { color: var(--anniversary-gold); }
+  .lb-row.r2 .rk { color: var(--graphite-grey-lightest); }
+  .lb-row.r3 .rk { color: var(--deep-red-lightest); }
+  .lb-row .nm { font-weight: 700; font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lb-row .mix { display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px; max-width: 240px; }
+  .lb-row .val { font-family: var(--display); font-size: 24px; font-weight: 700; text-align: right; }
+  .lb-row .gn { text-align: right; font-weight: 700; }
+  .lb-row .x { background: none; border: 0; color: var(--muted); opacity: 0; font-size: 18px; }
+  .lb-row:hover .x { opacity: 1; }
+  .empty { color: var(--muted); padding: 30px; text-align: center; }
+  .mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+  .mini-stats .stat { min-width: 0; padding: 12px 14px; }
+  .mini-stats .stat .v { font-size: 24px; }
+
+  /* Settings */
+  dialog { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 20px; width: min(980px, 94vw); max-height: 88vh; padding: 0; }
+  dialog::backdrop { background: rgba(29,38,51,.75); }
+  .dlg-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 2; }
+  .dlg-body { padding: 18px 22px; }
+  .ed { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .ed .f { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .ed label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+  .ed input { width: 100%; padding: 8px 10px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; }
+  .ed .rets { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .ed .full { grid-column: 1 / -1; }
+
+  .gate { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(29,38,51,.94); text-align: center; }
+  .gate h2 { font-size: 30px; margin-bottom: 10px; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--deep-red); color: var(--white); padding: 12px 20px; border-radius: 12px; font-weight: 600; z-index: 40; }
+  @media (max-width: 1000px) { .qr-layout, .res-layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="bar brandbar">
+  <img class="mazi" src="img/mazi-logo.svg" alt="Mazi Asset Management">
+  <span class="divider"></span>
+  <div class="title">Future Portfolio Challenge</div>
+  <span id="modeBadge" class="badge">Connecting</span>
+  <div class="sp"></div>
+  <button class="btn ghost small" id="homeBtn">Scenarios</button>
+  <button class="btn ghost small" id="settingsBtn">Settings</button>
+  <button class="btn ghost small" id="fsBtn">Full screen</button>
+</div>
+
+<div class="stage">
+  <!-- HOME -->
+  <section id="sHome" class="screen">
+    <div class="hero">
+      <h1>The future is coming.<br><em>How would you invest R10 million?</em></h1>
+      <p>Pick a scenario to start a round. The video plays, a QR code appears, learners build their portfolios on their phones, and the top 10 make the leaderboard.</p>
+    </div>
+    <div class="grid" id="scGrid"></div>
+  </section>
+
+  <!-- QR / OPEN -->
+  <section id="sOpen" class="screen hidden">
+    <div class="qr-layout">
+      <div class="qr-card">
+        <div id="qr"></div>
+        <div class="url" id="playUrl"></div>
+      </div>
+      <div class="qr-info">
+        <div class="kick" id="openKick">Scan to build your portfolio</div>
+        <h1 id="openTitle"></h1>
+        <p class="tag" id="openTag"></p>
+        <ol class="steps">
+          <li>Scan the QR code with your phone camera</li>
+          <li>Split your R10 million across the asset classes</li>
+          <li>Hit submit before the timer runs out</li>
+        </ol>
+        <div class="stats">
+          <div class="stat"><div class="v" id="subCount">0</div><div class="l">portfolios submitted</div></div>
+          <div class="stat" id="timerBox"><div class="v" id="timer">--:--</div><div class="l">time left</div></div>
+        </div>
+        <div class="ticker" id="ticker"></div>
+        <div class="row">
+          <select id="timerSel" aria-label="Timer">
+            <option value="0">No timer</option>
+            <option value="120">2 minutes</option>
+            <option value="180" selected>3 minutes</option>
+            <option value="300">5 minutes</option>
+          </select>
+          <button class="btn ghost" id="startTimerBtn">Start timer</button>
+          <button class="btn" id="closeBtn">Close submissions</button>
+          <button class="btn hidden" id="revealBtn">Reveal results</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="sResults" class="screen hidden">
+    <div class="res-head">
+      <div>
+        <div class="kick">Results</div>
+        <h1 id="resTitle"></h1>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="replayBtn">Replay leaderboard</button>
+        <button class="btn" id="nextBtn">Next scenario</button>
+      </div>
+    </div>
+    <div class="res-layout">
+      <div class="panel">
+        <h2>What happened over 5 years</h2>
+        <div id="returns"></div>
+        <div class="lesson" id="lesson"></div>
+        <div class="mini-stats">
+          <div class="stat"><div class="v" id="stN">0</div><div class="l">portfolios</div></div>
+          <div class="stat"><div class="v" id="stAvg">-</div><div class="l">class average</div></div>
+          <div class="stat"><div class="v" id="stBest">-</div><div class="l">best possible</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Top 10 portfolios</h2>
+        <div id="board"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- VIDEO -->
+<div class="video-wrap hidden" id="videoWrap">
+  <video id="video" playsinline controls></video>
+  <div class="video-missing hidden" id="videoMissing">
+    <div>
+      <h2 id="vmTitle">Video not found</h2>
+      <p class="muted" id="vmPath"></p>
+      <div class="row" style="justify-content:center;margin-top:18px">
+        <label class="btn ghost" style="display:inline-block">Choose video from computer<input type="file" accept="video/*" id="vmFile" hidden></label>
+        <button class="btn" id="vmSkip">Skip to portfolio builder</button>
+      </div>
+    </div>
+  </div>
+  <div class="video-ctrl" id="videoCtrl">
+    <label class="btn ghost small" style="background:rgba(29,38,51,.7)">Other video<input type="file" accept="video/*" id="vFile" hidden></label>
+    <button class="btn small" id="vSkip">Skip to QR code</button>
+  </div>
+</div>
+
+<div class="gate hidden" id="gate">
+  <div>
+    <h2>Presenter sign-in</h2>
+    <p class="muted">Sign in with the Google account listed in the database rules to run the game.</p>
+    <button class="btn" id="signInBtn" style="margin-top:14px">Sign in with Google</button>
+    <p class="muted" id="gateErr"></p>
+  </div>
+</div>
+
+<dialog id="settings">
+  <div class="dlg-head">
+    <h2>Scenarios and returns</h2>
+    <div class="row">
+      <button class="btn ghost small" id="addSc">Add scenario</button>
+      <button class="btn ghost small" id="resetSc">Reset to defaults</button>
+      <button class="btn small" id="saveSc">Save</button>
+    </div>
+  </div>
+  <div class="dlg-body">
+    <p class="muted" style="margin-top:0">Returns are cumulative over 5 years, in %. Video paths are relative to the site (put files in the <code>videos</code> folder) or a full URL. These settings are saved on this computer only.</p>
+    <div id="edList"></div>
+  </div>
+</dialog>
+
+<script type="module">
+import { createBackend } from "./js/backend.js";
+import { PUBLIC_PLAY_URL } from "./js/config.js";
+import { ASSETS, DEFAULT_SCENARIOS, STARTING_CAPITAL, portfolioValue, formatRandShort, formatPct } from "./js/scenarios.js";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const toast = (msg) => { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), 4000); };
+
+let backend, state = null, entries = [], unsubEntries = null, entriesRound = null, timerEnd = null, timerInt = null;
+const localVideos = {}; // scenarioId -> object URL chosen from computer
+const played = new Set(JSON.parse(sessionStorage.getItem("fpc:played") || "[]"));
+
+/* ---------------- scenarios (local overrides) ---------------- */
+function loadScenarios() {
+  try { const s = JSON.parse(localStorage.getItem("fpc:scenarios")); if (Array.isArray(s) && s.length) return s; } catch {}
+  return structuredClone(DEFAULT_SCENARIOS);
+}
+let scenarios = loadScenarios();
+const scenarioById = (id) => scenarios.find((s) => s.id === id);
+
+function renderHome() {
+  $("scGrid").innerHTML = scenarios.map((s, i) => `
+    <button class="sc ${played.has(s.id) ? "done" : ""}" data-id="${esc(s.id)}">
+      <span class="num">SCENARIO ${i + 1}${played.has(s.id) ? " - PLAYED" : ""}</span>
+      <h3>${esc(s.title)}</h3>
+      <p>${esc(s.tagline)}</p>
+      <span class="go">Start round &rarr;</span>
+    </button>`).join("");
+}
+$("scGrid").addEventListener("click", (e) => { const b = e.target.closest(".sc"); if (b) startRound(b.dataset.id); });
+
+/* ---------------- screens ---------------- */
+function showScreen(id) {
+  ["sHome", "sOpen", "sResults"].forEach((s) => $(s).classList.toggle("hidden", s !== id));
+}
+
+async function writeState(patch) {
+  const next = { ...(state || {}), ...patch, updatedAt: Date.now() };
+  try { await backend.setState(next); state = next; return true; }
+  catch (e) { console.error(e); toast("Could not update the game. Check you're signed in as the presenter."); return false; }
+}
+
+/* ---------------- round flow ---------------- */
+async function startRound(id) {
+  const sc = scenarioById(id); if (!sc) return;
+  const ok = await writeState({
+    roundId: "r" + Date.now().toString(36), scenarioId: sc.id, title: sc.title, tagline: sc.tagline,
+    phase: "video", returns: null, lesson: null,
+  });
+  if (!ok) return;
+  played.add(sc.id); sessionStorage.setItem("fpc:played", JSON.stringify([...played]));
+  playVideo(sc);
+}
+
+function playVideo(sc) {
+  const v = $("video");
+  $("videoWrap").classList.remove("hidden");
+  $("videoMissing").classList.add("hidden");
+  $("videoCtrl").classList.remove("hidden");
+  v.src = localVideos[sc.id] || sc.video || "";
+  v.onerror = () => {
+    $("vmTitle").textContent = sc.title;
+    $("vmPath").textContent = sc.video ? `Couldn't load "${sc.video}". Choose the file, or skip straight to the portfolio builder.` : "No video set for this scenario.";
+    $("videoMissing").classList.remove("hidden");
+    $("videoCtrl").classList.add("hidden");
+  };
+  v.onended = () => openSubmissions();
+  if (v.src && v.src !== location.href) v.play().catch(() => {}); else v.onerror();
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+}
+function useLocalFile(file) {
+  if (!file || !state) return;
+  localVideos[state.scenarioId] = URL.createObjectURL(file);
+  playVideo(scenarioById(state.scenarioId) || { id: state.scenarioId });
+}
+$("vmFile").addEventListener("change", (e) => useLocalFile(e.target.files[0]));
+$("vFile").addEventListener("change", (e) => useLocalFile(e.target.files[0]));
+$("vmSkip").addEventListener("click", () => openSubmissions());
+$("vSkip").addEventListener("click", () => openSubmissions());
+
+function closeVideo() { const v = $("video"); v.pause(); v.onerror = null; v.removeAttribute("src"); v.load(); $("videoWrap").classList.add("hidden"); }
+
+async function openSubmissions() {
+  closeVideo();
+  if (state?.phase !== "open") { if (!(await writeState({ phase: "open" }))) return; }
+  renderOpen();
+}
+
+function playUrl() { return PUBLIC_PLAY_URL || new URL("play.html", location.href).href; }
+
+function renderOpen() {
+  showScreen("sOpen");
+  $("openTitle").textContent = state?.title || "";
+  $("openTag").textContent = state?.tagline || "";
+  const url = playUrl();
+  $("playUrl").textContent = url.replace(/^https?:\/\//, "");
+  $("qr").innerHTML = "";
+  if (window.QRCode) new QRCode($("qr"), { text: url, width: 440, height: 440, colorDark: "#1d2633", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+  else $("qr").innerHTML = '<p style="color:#1d2633">QR library could not load - share the link below.</p>';
+  if (backend.mode === "demo") $("openKick").textContent = "Demo mode - open the link in other browser tabs";
+  const closed = state?.phase === "closed";
+  $("closeBtn").classList.toggle("hidden", closed);
+  $("revealBtn").classList.toggle("hidden", !closed);
+  $("startTimerBtn").classList.toggle("hidden", closed);
+  $("timerSel").classList.toggle("hidden", closed);
+  $("timerBox").classList.toggle("hidden", !timerEnd && !closed);
+  if (closed) $("timer").textContent = "Closed";
+  renderTicker();
+}
+
+function renderTicker() {
+  $("subCount").textContent = entries.length;
+  const recent = [...entries].sort((a, b) => b.submittedAt - a.submittedAt).slice(0, 18);
+  $("ticker").innerHTML = recent.map((e) => `<span class="chip">${esc(e.name)}</span>`).join("");
+}
+
+$("startTimerBtn").addEventListener("click", () => {
+  const secs = +$("timerSel").value;
+  clearInterval(timerInt); timerEnd = null;
+  if (!secs) { $("timerBox").classList.add("hidden"); return; }
+  timerEnd = Date.now() + secs * 1000;
+  $("timerBox").classList.remove("hidden");
+  const tick = () => {
+    const left = Math.max(0, Math.round((timerEnd - Date.now()) / 1000));
+    $("timer").textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`;
+    if (left <= 0) { clearInterval(timerInt); timerEnd = null; closeSubmissions(); }
+  };
+  tick(); timerInt = setInterval(tick, 500);
+});
+
+async function closeSubmissions() {
+  clearInterval(timerInt); timerEnd = null;
+  if (await writeState({ phase: "closed" })) renderOpen();
+}
+$("closeBtn").addEventListener("click", closeSubmissions);
+$("revealBtn").addEventListener("click", reveal);
+
+async function reveal() {
+  const sc = scenarioById(state?.scenarioId);
+  const returns = sc?.returns || state?.returns || {};
+  if (await writeState({ phase: "results", returns, lesson: sc?.lesson || "" })) renderResults(true);
+}
+
+/* ---------------- results ---------------- */
+function ranked() {
+  const r = state?.returns || {};
+  return entries
+    .map((e) => ({ ...e, value: portfolioValue(e.alloc, r) }))
+    .sort((a, b) => b.value - a.value || a.submittedAt - b.submittedAt);
+}
+
+function renderResults(animate) {
+  showScreen("sResults");
+  const r = state?.returns || {};
+  $("resTitle").textContent = state?.title || "";
+  const maxAbs = Math.max(10, ...ASSETS.map((a) => Math.abs(r[a.id] || 0)));
+  $("returns").innerHTML = [...ASSETS].sort((a, b) => (r[b.id] || 0) - (r[a.id] || 0)).map((a, i) => {
+    const v = r[a.id] || 0, w = (Math.abs(v) / maxAbs) * 50;
+    const pos = v >= 0 ? `left:50%;width:${w}%;transform-origin:left` : `right:50%;width:${w}%;transform-origin:right`;
+    return `<div class="ret"><span>${a.name}</span><div class="track"><div class="fill" style="${pos};background:${v >= 0 ? a.colour : "var(--red-bar)"};animation-delay:${i * 0.08}s"></div></div><span class="val ${v >= 0 ? "pos" : "neg"}">${formatPct(v)}</span></div>`;
+  }).join("");
+  $("lesson").textContent = state?.lesson || "";
+  $("lesson").classList.toggle("hidden", !state?.lesson);
+
+  const list = ranked();
+  const best = Math.max(...ASSETS.map((a) => r[a.id] || 0));
+  $("stN").textContent = list.length;
+  $("stAvg").textContent = list.length ? formatRandShort(list.reduce((s, e) => s + e.value, 0) / list.length) : "-";
+  $("stBest").textContent = formatRandShort(STARTING_CAPITAL * (1 + best / 100));
+
+  const top = list.slice(0, 10);
+  if (!top.length) { $("board").innerHTML = '<div class="empty">No portfolios were submitted this round.</div>'; return; }
+  const n = top.length;
+  $("board").innerHTML = top.map((e, i) => {
+    const gain = (e.value / STARTING_CAPITAL - 1) * 100;
+    const mix = ASSETS.map((a) => `<span style="width:${e.alloc[a.id] || 0}%;background:${a.colour}"></span>`).join("");
+    const delay = animate ? (n - 1 - i) * 0.35 + 0.6 : 0;
+    return `<div class="lb-row r${i + 1}" style="animation-delay:${delay}s">
+      <div class="rk">${i + 1}</div>
+      <div style="min-width:0"><div class="nm">${esc(e.name)}</div><div class="mix">${mix}</div></div>
+      <div class="val">${formatRandShort(e.value)}</div>
+      <div class="gn ${gain >= 0 ? "pos" : "neg"}">${formatPct(gain)}</div>
+      <button class="x" data-uid="${esc(e.uid)}" title="Remove this entry">&times;</button>
+    </div>`;
+  }).join("");
+}
+$("board").addEventListener("click", async (e) => {
+  const b = e.target.closest(".x"); if (!b || !state) return;
+  if (!confirm("Remove this entry from the leaderboard?")) return;
+  try { await backend.deleteEntry(state.roundId, b.dataset.uid); } catch { toast("Could not remove that entry."); }
+});
+$("replayBtn").addEventListener("click", () => renderResults(true));
+$("nextBtn").addEventListener("click", goHome);
+$("homeBtn").addEventListener("click", goHome);
+
+async function goHome() {
+  closeVideo(); clearInterval(timerInt); timerEnd = null;
+  if (state && state.phase !== "idle") await writeState({ phase: "idle" });
+  renderHome(); showScreen("sHome");
+}
+
+/* ---------------- entries ---------------- */
+function watchRoundEntries() {
+  if (!state?.roundId || state.roundId === entriesRound) return;
+  unsubEntries?.(); entriesRound = state.roundId; entries = [];
+  unsubEntries = backend.watchEntries(state.roundId, (list) => {
+    entries = list;
+    if (!$("sOpen").classList.contains("hidden")) renderTicker();
+    if (!$("sResults").classList.contains("hidden")) renderResults(false);
+  });
+}
+
+/* ---------------- settings ---------------- */
+function renderSettings() {
+  $("edList").innerHTML = scenarios.map((s, i) => `
+    <div class="ed" data-i="${i}">
+      <div class="f">
+        <div><label>Title</label><input data-k="title" value="${esc(s.title)}"></div>
+        <div><label>Video file or URL</label><input data-k="video" value="${esc(s.video)}"></div>
+        <div class="full"><label>Tagline (shown to learners)</label><input data-k="tagline" value="${esc(s.tagline)}"></div>
+        <div class="full"><label>Lesson (shown at the reveal)</label><input data-k="lesson" value="${esc(s.lesson)}"></div>
+      </div>
+      <div class="rets">${ASSETS.map((a) => `<div><label>${a.name} %</label><input type="number" data-r="${a.id}" value="${s.returns?.[a.id] ?? 0}"></div>`).join("")}</div>
+      <div style="margin-top:10px;text-align:right"><button class="btn ghost small" data-del="${i}">Delete scenario</button></div>
+    </div>`).join("");
+}
+function readSettings() {
+  return [...document.querySelectorAll(".ed")].map((el, i) => {
+    const s = { ...scenarios[i], returns: {} };
+    el.querySelectorAll("[data-k]").forEach((inp) => (s[inp.dataset.k] = inp.value.trim()));
+    el.querySelectorAll("[data-r]").forEach((inp) => (s.returns[inp.dataset.r] = Number(inp.value) || 0));
+    return s;
+  });
+}
+$("settingsBtn").addEventListener("click", () => { renderSettings(); $("settings").showModal(); });
+$("addSc").addEventListener("click", () => {
+  scenarios = readSettings();
+  scenarios.push({ id: "sc-" + Date.now().toString(36), title: "New scenario", tagline: "", video: "videos/", lesson: "", returns: Object.fromEntries(ASSETS.map((a) => [a.id, 0])) });
+  renderSettings();
+});
+$("edList").addEventListener("click", (e) => {
+  const d = e.target.closest("[data-del]"); if (!d) return;
+  scenarios = readSettings(); scenarios.splice(+d.dataset.del, 1); renderSettings();
+});
+$("resetSc").addEventListener("click", () => { if (confirm("Reset all scenarios to the defaults?")) { scenarios = structuredClone(DEFAULT_SCENARIOS); renderSettings(); } });
+$("saveSc").addEventListener("click", () => {
+  scenarios = readSettings();
+  localStorage.setItem("fpc:scenarios", JSON.stringify(scenarios));
+  $("settings").close(); renderHome();
+});
+
+$("fsBtn").addEventListener("click", () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.());
+
+/* ---------------- boot ---------------- */
+function resume() {
+  if (!state || !state.roundId || state.phase === "idle") { renderHome(); return showScreen("sHome"); }
+  if (state.phase === "video") { const sc = scenarioById(state.scenarioId); return sc ? playVideo(sc) : openSubmissions(); }
+  if (state.phase === "open" || state.phase === "closed") return renderOpen();
+  if (state.phase === "results") return renderResults(false);
+}
+
+(async () => {
+  backend = await createBackend();
+  $("modeBadge").textContent = backend.mode === "live" ? "Live" : "Demo mode";
+  $("modeBadge").classList.add(backend.mode);
+  renderHome();
+
+  let booted = false;
+  const boot = () => {
+    if (booted) return; booted = true;
+    $("gate").classList.add("hidden");
+    let first = true;
+    backend.watchState((s) => {
+      state = s;
+      watchRoundEntries();
+      if (first) { first = false; resume(); }
+    });
+  };
+  backend.onPresenterChange((u) => { if (u) boot(); else $("gate").classList.remove("hidden"); });
+  $("signInBtn").addEventListener("click", async () => {
+    try { await backend.signInPresenter(); } catch (e) { $("gateErr").textContent = "Sign-in failed: " + (e.code || e.message); }
+  });
+})().catch((e) => { console.error(e); $("modeBadge").textContent = "Offline"; toast("Could not connect to the database."); });
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+Put your scenario videos in this folder with these names (or change the names in Settings / js/scenarios.js):
+
+  ai-boom.mp4
+  green-shift.mp4
+  global-shock.mp4
+  sa-rising.mp4
+
+MP4 (H.264) plays in every browser. Keep each file under ~200 MB so the site deploys quickly.
+You can also skip this folder and pick a video from your laptop on the night ("Choose video from computer").

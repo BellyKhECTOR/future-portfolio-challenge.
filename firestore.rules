@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // >>> Put the Google account(s) allowed to run the presenter screen here <<<
+    function isPresenter() {
+      return request.auth != null
+        && request.auth.token.email in ['PRESENTER_EMAIL@example.com'];
+    }
+
+    function game() {
+      return get(/databases/$(database)/documents/game/state).data;
+    }
+
+    function validEntry(d) {
+      let a = d.alloc;
+      return d.keys().hasOnly(['name', 'alloc', 'submittedAt'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 20
+        && d.submittedAt == request.time
+        && a is map
+        && a.keys().hasAll(['saEq', 'saBond', 'saProp', 'saCash', 'glEq', 'glBond', 'gold'])
+        && a.keys().hasOnly(['saEq', 'saBond', 'saProp', 'saCash', 'glEq', 'glBond', 'gold'])
+        && a.saEq is int && a.saBond is int && a.saProp is int && a.saCash is int
+        && a.glEq is int && a.glBond is int && a.gold is int
+        && a.saEq >= 0 && a.saBond >= 0 && a.saProp >= 0 && a.saCash >= 0
+        && a.glEq >= 0 && a.glBond >= 0 && a.gold >= 0
+        && a.saEq + a.saBond + a.saProp + a.saCash + a.glEq + a.glBond + a.gold == 100;
+    }
+
+    // Game state: everyone signed in (learners sign in anonymously) can read,
+    // only the presenter can change it.
+    match /game/state {
+      allow read: if request.auth != null;
+      allow write: if isPresenter();
+    }
+
+    // One entry per learner per round. Learners can only write their own,
+    // only while submissions are open for that round.
+    match /rounds/{roundId}/entries/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && game().phase == 'open'
+        && game().roundId == roundId
+        && validEntry(request.resource.data);
+      allow delete: if isPresenter();
+    }
+  }
+}

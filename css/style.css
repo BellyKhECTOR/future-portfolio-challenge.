@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Oswald:wght@500;600&display=swap");
+
+/* Mazi Asset Management palette (from the official mazi-assetmanagement.co.za stylesheet) */
+:root {
+  --charcoal-navy: #1d2633;
+  --charcoal-navy-light: #39404c;
+  --charcoal-navy-lighter: #55606c;
+  --charcoal-navy-lightest: #c9ced6;
+  --deep-red: #77121b;
+  --deep-red-light: #8a3a3b;
+  --deep-red-lighter: #a65b5c;
+  --deep-red-lightest: #ddb8b8;
+  --graphite-grey: #535a62;
+  --graphite-grey-lighter: #a8acb1;
+  --graphite-grey-lightest: #e4e6e8;
+  --warm-sand: #fdcda2;
+  --warm-sand-lightest: #fcf5eb;
+  --anniversary-gold: #c39b53;
+  --light-grey: #f2f2f2;
+  --white: #ffffff;
+
+  /* Roles */
+  --bg: var(--charcoal-navy);
+  --bg-2: rgba(29, 38, 51, .55);          /* charcoal navy inset on cards */
+  --card: var(--charcoal-navy-light);
+  --card-2: var(--charcoal-navy-lighter);
+  --line: var(--charcoal-navy-lighter);
+  --text: var(--white);
+  --muted: var(--charcoal-navy-lightest);
+  --gold: var(--warm-sand);               /* primary accent: buttons, kickers, highlights */
+  --award: var(--anniversary-gold);       /* winner and positive returns */
+  --green: var(--anniversary-gold);       /* positive values */
+  --red: var(--deep-red-lightest);        /* negative values (text) */
+  --red-bar: var(--deep-red-lighter);     /* negative values (bars) */
+  --radius: 14px;
+  --display: "Outfit", system-ui, sans-serif;
+  --body: "Outfit", system-ui, sans-serif;
+  --condensed: "Oswald", "Outfit", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+button { font: inherit; cursor: pointer; }
+input { font: inherit; }
+.hidden { display: none !important; }
+
+/* Brand header: white bar so the Mazi logo sits on its intended background, deep red rule beneath */
+.brandbar {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--white); color: var(--charcoal-navy);
+  border-bottom: 4px solid var(--deep-red);
+}
+.brandbar img.mazi { height: 40px; width: auto; display: block; }
+.brandbar .divider { width: 1px; align-self: stretch; background: var(--graphite-grey-lightest); margin: 4px 4px; }
+.brandbar .title { font-family: var(--condensed); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--charcoal-navy); }
+.brandbar .badge { background: var(--light-grey); color: var(--graphite-grey); border-color: var(--graphite-grey-lightest); }
+.brandbar .btn.ghost { color: var(--charcoal-navy); border-color: var(--graphite-grey-lighter); }
+.brandbar .btn.ghost:hover { border-color: var(--deep-red); color: var(--deep-red); }
+
+.btn {
+  border: 0; border-radius: 999px; padding: 12px 22px;
+  background: var(--warm-sand); color: var(--charcoal-navy); font-weight: 600;
+  transition: transform .1s ease, opacity .2s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.btn.small { padding: 8px 14px; font-size: 14px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: var(--card-2); color: var(--muted); border: 1px solid var(--line);
+}
+.badge.live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--deep-red); }
+.badge.demo::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--anniversary-gold); }
+.muted { color: var(--muted); }
+.pos { color: var(--green); }
+.neg { color: var(--red); }

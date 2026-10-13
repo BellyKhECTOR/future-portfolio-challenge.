@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Build Your Portfolio</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  main { max-width: 560px; margin: 0 auto; padding: 18px 16px 120px; }
+  header.brandbar { justify-content: space-between; margin: -18px -16px 18px; padding: 10px 16px; }
+  header.brandbar img.mazi { height: 30px; }
+  header.brandbar .title { font-size: 12px; }
+  .screen { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .centre { text-align: center; padding: 60px 10px; }
+  .centre h1 { font-size: 30px; margin-bottom: 10px; }
+  .pulse { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 22px; background: var(--gold); opacity: .9; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(.8); opacity: .5; } 50% { transform: scale(1); opacity: 1; } }
+
+  .scenario { background: var(--card); border-top: 4px solid var(--deep-red) !important; border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+  .scenario .kicker { font-family: var(--condensed); font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); font-weight: 500; }
+  .scenario h1 { font-size: 26px; margin: 4px 0 6px; }
+  .scenario p { margin: 0; color: var(--muted); }
+
+  label.name { display: block; font-weight: 600; margin: 18px 0 8px; }
+  .name-input { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font-size: 17px; }
+  .name-input:focus { outline: 2px solid var(--gold); border-color: transparent; }
+
+  .capital { display: flex; justify-content: space-between; align-items: baseline; margin: 22px 0 10px; }
+  .capital strong { font-family: var(--display); font-size: 20px; }
+
+  .asset { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .asset .top { display: flex; align-items: center; gap: 10px; }
+  .dot { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+  .asset .nm { font-weight: 700; }
+  .asset .bl { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .asset .pct { margin-left: auto; font-family: var(--display); font-size: 22px; font-weight: 600; min-width: 64px; text-align: right; }
+  .asset .row2 { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .step { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--card-2); color: var(--text); font-size: 20px; font-weight: 700; flex: none; }
+  input[type=range] { flex: 1; accent-color: var(--gold); height: 28px; }
+  .asset .rand { font-size: 13px; color: var(--muted); margin-top: 6px; text-align: right; }
+
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(29,38,51,.96); backdrop-filter: blur(10px); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
+  .dock-inner { max-width: 560px; margin: 0 auto; }
+  .meter { height: 10px; border-radius: 999px; background: var(--card-2); overflow: hidden; display: flex; }
+  .meter span { height: 100%; transition: width .2s ease; }
+  .dock-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 12px; }
+  .total { font-weight: 700; }
+  .total.over { color: var(--red); }
+  .total.ok { color: var(--green); }
+  .dock .btn { flex: none; }
+
+  .done-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; text-align: center; }
+  .done-card h1 { font-size: 26px; margin: 10px 0 6px; }
+  .tick { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto; background: var(--anniversary-gold); display: grid; place-items: center; color: var(--charcoal-navy); font-size: 34px; font-weight: 800; }
+  .summary { margin: 18px 0 0; text-align: left; }
+  .summary .r { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .summary .r:last-child { border: 0; }
+  .summary .r .v { margin-left: auto; font-weight: 700; }
+
+  .result-hero { text-align: center; padding: 18px 0 8px; }
+  .result-hero .big { font-family: var(--display); font-size: 44px; font-weight: 700; }
+  .result-hero .rank { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: var(--card-2); font-weight: 700; }
+  .lesson { background: var(--card); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px; margin: 18px 0; color: var(--muted); }
+  .err { color: var(--red); font-size: 14px; margin-top: 8px; min-height: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <header class="brandbar">
+    <img class="mazi" src="img/mazi-logo.svg" alt="Mazi Asset Management">
+    <div class="title">Future Portfolio Challenge</div>
+    <span id="modeBadge" class="badge">Connecting</span>
+  </header>
+
+  <section id="sWait" class="screen centre">
+    <div class="pulse"></div>
+    <h1>Eyes on the big screen</h1>
+    <p class="muted">The portfolio builder opens as soon as the video ends.</p>
+  </section>
+
+  <section id="sBuild" class="screen hidden">
+    <div class="scenario">
+      <div class="kicker">Your scenario</div>
+      <h1 id="scTitle"></h1>
+      <p id="scTag"></p>
+    </div>
+    <p class="muted" style="margin:0">You manage <strong style="color:var(--text)">R10 million</strong>. Split it across the asset classes below so it adds up to exactly 100%. The best-performing portfolio wins.</p>
+
+    <label class="name" for="nameIn">Your name or team name</label>
+    <input id="nameIn" class="name-input" maxlength="20" autocomplete="off" placeholder="e.g. Thandi M">
+
+    <div class="capital"><span class="muted">Starting capital</span><strong>R10 000 000</strong></div>
+    <div id="assetList"></div>
+  </section>
+
+  <section id="sDone" class="screen hidden">
+    <div class="done-card">
+      <div class="tick">&#10003;</div>
+      <h1>Portfolio locked in</h1>
+      <p class="muted">Watch the big screen for the results. You can still change your mind until the presenter closes submissions.</p>
+      <div id="doneSummary" class="summary"></div>
+      <button id="editBtn" class="btn ghost" style="margin-top:16px">Change my portfolio</button>
+    </div>
+  </section>
+
+  <section id="sClosed" class="screen centre hidden">
+    <div class="pulse"></div>
+    <h1>Submissions closed</h1>
+    <p class="muted" id="closedMsg">The results are about to be revealed.</p>
+  </section>
+
+  <section id="sResult" class="screen hidden">
+    <div class="scenario">
+      <div class="kicker">Results</div>
+      <h1 id="rsTitle"></h1>
+    </div>
+    <div class="result-hero">
+      <div class="muted">Your R10 million is now worth</div>
+      <div class="big" id="rsValue"></div>
+      <div id="rsGain"></div>
+      <div class="rank" id="rsRank"></div>
+    </div>
+    <div class="lesson" id="rsLesson"></div>
+    <div class="summary" id="rsBreakdown"></div>
+  </section>
+</main>
+
+<div id="dock" class="dock hidden">
+  <div class="dock-inner">
+    <div class="meter" id="meter"></div>
+    <div class="dock-row">
+      <div><div class="total" id="total">0% allocated</div><div class="err" id="err"></div></div>
+      <button id="submitBtn" class="btn" disabled>Submit</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createBackend } from "./js/backend.js";
+import { ASSETS, STARTING_CAPITAL, portfolioValue, formatRand, formatPct } from "./js/scenarios.js";
+
+const $ = (id) => document.getElementById(id);
+const screens = ["sWait", "sBuild", "sDone", "sClosed", "sResult"];
+const show = (id) => { screens.forEach((s) => $(s).classList.toggle("hidden", s !== id)); $("dock").classList.toggle("hidden", id !== "sBuild"); };
+
+let backend, uid, state = null, alloc = {}, editing = false, entries = [], unsubEntries = null, entriesRound = null;
+ASSETS.forEach((a) => (alloc[a.id] = 0));
+
+const savedName = localStorage.getItem("fpc:name");
+if (savedName) $("nameIn").value = savedName;
+
+/* ---------- build allocation rows ---------- */
+$("assetList").innerHTML = ASSETS.map((a) => `
+  <div class="asset" data-id="${a.id}">
+    <div class="top">
+      <span class="dot" style="background:${a.colour}"></span>
+      <div><div class="nm">${a.name}</div><div class="bl">${a.blurb}</div></div>
+      <div class="pct" id="p_${a.id}">0%</div>
+    </div>
+    <div class="row2">
+      <button class="step" data-d="-5" aria-label="Less ${a.name}">&minus;</button>
+      <input type="range" min="0" max="100" step="1" value="0" id="r_${a.id}" aria-label="${a.name} percentage">
+      <button class="step" data-d="5" aria-label="More ${a.name}">+</button>
+    </div>
+    <div class="rand" id="m_${a.id}">R0</div>
+  </div>`).join("");
+
+const totalPct = () => ASSETS.reduce((s, a) => s + alloc[a.id], 0);
+
+function setAlloc(id, v) {
+  alloc[id] = Math.max(0, Math.min(100, Math.round(v)));
+  render();
+}
+
+$("assetList").addEventListener("input", (e) => {
+  if (e.target.type === "range") setAlloc(e.target.id.slice(2), +e.target.value);
+});
+$("assetList").addEventListener("click", (e) => {
+  const b = e.target.closest(".step"); if (!b) return;
+  const id = b.closest(".asset").dataset.id;
+  setAlloc(id, alloc[id] + Number(b.dataset.d));
+});
+$("nameIn").addEventListener("input", render);
+
+function render() {
+  const t = totalPct();
+  ASSETS.forEach((a) => {
+    $("p_" + a.id).textContent = alloc[a.id] + "%";
+    $("r_" + a.id).value = alloc[a.id];
+    $("m_" + a.id).textContent = formatRand(STARTING_CAPITAL * alloc[a.id] / 100);
+  });
+  $("meter").innerHTML = ASSETS.map((a) => `<span style="width:${Math.min(alloc[a.id], 100)}%;background:${a.colour}"></span>`).join("");
+  const el = $("total");
+  el.className = "total" + (t > 100 ? " over" : t === 100 ? " ok" : "");
+  el.textContent = t === 100 ? "100% allocated - ready!" : t > 100 ? `${t}% - remove ${t - 100}%` : `${t}% allocated - ${100 - t}% left`;
+  const name = $("nameIn").value.trim();
+  $("submitBtn").disabled = !(t === 100 && name.length > 0);
+  $("err").textContent = t === 100 && !name ? "Add your name above" : "";
+}
+
+$("submitBtn").addEventListener("click", async () => {
+  const name = $("nameIn").value.trim().slice(0, 20);
+  if (!name || totalPct() !== 100 || !state) return;
+  $("submitBtn").disabled = true; $("submitBtn").textContent = "Sending...";
+  try {
+    await backend.submitEntry(state.roundId, uid, { name, alloc: { ...alloc } });
+    localStorage.setItem("fpc:name", name);
+    localStorage.setItem("fpc:sub:" + state.roundId + ":" + uid, JSON.stringify(alloc));
+    editing = false;
+    route();
+  } catch (e) {
+    console.error(e);
+    $("err").textContent = "Could not submit - submissions may be closed.";
+  } finally {
+    $("submitBtn").textContent = "Submit"; render();
+  }
+});
+$("editBtn").addEventListener("click", () => { editing = true; route(); });
+
+function mySubmission() {
+  if (!state) return null;
+  const mine = entries.find((e) => e.uid === uid);
+  if (mine) return mine.alloc;
+  try { return JSON.parse(localStorage.getItem("fpc:sub:" + state.roundId + ":" + uid)); } catch { return null; }
+}
+
+function summaryHtml(a, returns) {
+  return ASSETS.filter((x) => a[x.id] > 0).map((x) => {
+    const r = returns ? `<span class="${returns[x.id] >= 0 ? "pos" : "neg"}" style="font-size:13px;margin-left:8px">${formatPct(returns[x.id])}</span>` : "";
+    return `<div class="r"><span class="dot" style="background:${x.colour}"></span>${x.name}${r}<span class="v">${a[x.id]}%</span></div>`;
+  }).join("");
+}
+
+/* ---------- routing on game state ---------- */
+function route() {
+  const s = state;
+  if (!s || !s.roundId || s.phase === "video" || s.phase === "idle") return show("sWait");
+  const sub = mySubmission();
+
+  if (s.phase === "open") {
+    $("scTitle").textContent = s.title || "";
+    $("scTag").textContent = s.tagline || "";
+    if (sub && !editing) { $("doneSummary").innerHTML = summaryHtml(sub); return show("sDone"); }
+    if (sub && editing) { Object.assign(alloc, sub); }
+    render();
+    return show("sBuild");
+  }
+  if (s.phase === "closed") {
+    $("closedMsg").textContent = sub ? "The results are about to be revealed." : "You didn't submit a portfolio this round. Join in on the next one!";
+    return show("sClosed");
+  }
+  if (s.phase === "results") {
+    if (!sub) { $("closedMsg").textContent = "Results are on the big screen. Join in on the next round!"; return show("sClosed"); }
+    const v = portfolioValue(sub, s.returns);
+    const gain = (v / STARTING_CAPITAL - 1) * 100;
+    $("rsTitle").textContent = s.title || "";
+    $("rsValue").textContent = formatRand(v);
+    $("rsGain").innerHTML = `<span class="${gain >= 0 ? "pos" : "neg"}" style="font-weight:700">${formatPct(gain)} (${gain >= 0 ? "+" : ""}${formatRand(v - STARTING_CAPITAL)})</span>`;
+    $("rsLesson").textContent = s.lesson || "";
+    $("rsBreakdown").innerHTML = summaryHtml(sub, s.returns);
+    const ranked = entries.map((e) => portfolioValue(e.alloc, s.returns)).sort((a, b) => b - a);
+    const pos = ranked.findIndex((x) => x <= v + 0.5) + 1;
+    $("rsRank").textContent = ranked.length ? `You placed ${pos || ranked.length} of ${ranked.length}` : "";
+    return show("sResult");
+  }
+  show("sWait");
+}
+
+function watchRoundEntries() {
+  if (!state?.roundId || state.roundId === entriesRound) return;
+  unsubEntries?.(); entriesRound = state.roundId;
+  unsubEntries = backend.watchEntries(state.roundId, (list) => { entries = list; if (state?.phase === "results" || (state?.phase === "open" && !editing)) route(); });
+}
+
+(async () => {
+  backend = await createBackend();
+  $("modeBadge").textContent = backend.mode === "live" ? "Live" : "Demo";
+  $("modeBadge").classList.add(backend.mode);
+  uid = await backend.signInLearner();
+  backend.watchState((s) => {
+    const newRound = s?.roundId !== state?.roundId;
+    state = s;
+    if (newRound) { editing = false; entries = []; ASSETS.forEach((a) => (alloc[a.id] = 0)); }
+    watchRoundEntries();
+    route();
+  });
+})().catch((e) => {
+  console.error(e);
+  $("modeBadge").textContent = "Offline";
+  document.querySelector("#sWait h1").textContent = "Can't connect right now";
+  document.querySelector("#sWait p").textContent = "Check your data or Wi-Fi and refresh this page.";
+});
+</script>
+</body>
+</html>
