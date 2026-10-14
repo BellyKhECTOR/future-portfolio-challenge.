@@ -58,7 +58,8 @@ The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 20
 3. When the video ends (or you press **Skip to QR code**), the QR appears and submissions open. Optionally start a timer.
 4. Learners scan, enter a name and split their wealth to exactly 100%. From chapter 2 onwards their phone shows what their portfolio is worth and pre-fills their last mix.
 5. Press **Close submissions**, then **Reveal results**. The chapter's returns appear and the top 10 by **total wealth** animate in, with arrows showing who moved up or down. Each phone shows that learner's wealth, change this chapter, total since 2026 and rank.
-6. Press **Continue to 2046** and repeat. After 2055 the board is marked **Final standings**.
+6. Press **Continue to 2046** and repeat.
+7. After the 2055 chapter, **Reveal results** starts the **winners ceremony**: a 5-second countdown, then third place, the runner-up and the winner on a podium (with confetti and sound), then a chart of how the top three's wealth grew from 2026 to 2055 against the class average. Phones show "The winners are being revealed!" until the ceremony ends, then each learner's final result. Use **Full leaderboard** (or Esc) to see the top 10, and **Winners ceremony** on the results screen to replay it. Turn the laptop sound on for the countdown ticks and fanfare.
 
 Rules of the journey:
 - A learner who doesn't submit in a chapter keeps their previous mix.

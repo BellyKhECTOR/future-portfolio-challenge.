@@ -253,6 +253,7 @@ function summaryHtml(a, returns) {
 /* ---------- routing on game state ---------- */
 function route() {
   const s = state;
+  document.querySelector("#sWait h1").textContent = "Eyes on the big screen";
   if (!s || !s.roundId || s.phase === "idle") {
     $("waitMsg").textContent = history().length ? "The next chapter starts soon. Your wealth is waiting for you." : "The portfolio builder opens as soon as the video ends.";
     return show("sWait");
@@ -282,6 +283,11 @@ function route() {
   if (s.phase === "closed") {
     $("closedMsg").textContent = sub ? "The results are about to be revealed." : me ? "You didn't rebalance, so your previous portfolio carries on into this chapter." : "You didn't submit a portfolio this time. Join in on the next chapter!";
     return show("sClosed");
+  }
+  if (s.phase === "finale") {
+    document.querySelector("#sWait h1").textContent = "The winners are being revealed!";
+    $("waitMsg").textContent = "Eyes on the big screen. Your final result appears here right after the ceremony.";
+    return show("sWait");
   }
   if (s.phase === "results") {
     const hist = history();

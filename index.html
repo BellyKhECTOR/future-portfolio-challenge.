@@ -129,6 +129,50 @@
   .board-head span:nth-child(3) { text-align: center; }
   .final-banner { display: inline-block; margin-top: 8px; padding: 6px 14px; border-radius: 999px; background: var(--deep-red); color: var(--white); font-weight: 600; }
   @media (max-width: 1100px) { .tl { grid-template-columns: repeat(2, 1fr); } .tl::before { display: none; } }
+  /* Final ceremony */
+  .finale { position: fixed; inset: 0; z-index: 25; background: radial-gradient(1200px 700px at 50% 30%, #3a1a22 0%, #1d2633 55%, #141a24 100%); display: flex; flex-direction: column; align-items: center; padding: 3vh 4vw 2vh; overflow: hidden; }
+  .finale canvas { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+  .fin-top { display: flex; align-items: center; gap: 18px; }
+  .fin-top img { height: 7vh; }
+  .fin-top .kick { font-size: 2.4vh; }
+  .cd { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4vh; }
+  .cd-lbl { font-size: 4.4vh; font-weight: 600; color: var(--warm-sand); text-align: center; }
+  .cd-ring { position: relative; width: 46vh; height: 46vh; }
+  .cd-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .cd-ring .trk { fill: none; stroke: rgba(201,206,214,.15); stroke-width: 8; }
+  .cd-ring .prog { fill: none; stroke: var(--anniversary-gold); stroke-width: 8; stroke-linecap: round; }
+  .cd-num { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--condensed); font-weight: 600; font-size: 30vh; line-height: 1; }
+  .cd-num.pop { animation: cdpop .9s ease-out; }
+  @keyframes cdpop { 0% { transform: scale(1.5); opacity: 0; } 25% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  .fin-cap { font-size: 3.4vh; font-weight: 600; color: var(--warm-sand); min-height: 4.4vh; margin: 1.2vh 0 .4vh; text-align: center; }
+  .podium { width: min(1500px, 92vw); display: grid; grid-template-columns: 1fr 1.15fr 1fr; align-items: end; gap: 2vw; height: 46vh; border-bottom: 3px solid var(--anniversary-gold); }
+  .pod { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; opacity: 0; }
+  .pod.show { opacity: 1; }
+  .pod .card { text-align: center; opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; margin-bottom: 1.4vh; width: 100%; }
+  .pod.show .card { opacity: 1; transform: none; }
+  .pod .place { font-family: var(--condensed); letter-spacing: .14em; text-transform: uppercase; font-size: 2.2vh; color: var(--muted); }
+  .pod .nm { font-size: 4.6vh; font-weight: 700; margin: .4vh 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pod.p1 .nm { font-size: 6vh; color: var(--anniversary-gold); }
+  .pod .w { font-family: var(--display); font-size: 3.6vh; font-weight: 700; }
+  .pod.p1 .w { font-size: 4.4vh; }
+  .pod .g { font-size: 2.2vh; font-weight: 600; color: var(--anniversary-gold); margin-top: .3vh; }
+  .pod .block { width: 100%; border-radius: 16px 16px 0 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 1.4vh; font-family: var(--condensed); font-weight: 600; font-size: 6.5vh; line-height: 1; height: 0; transition: height 1s cubic-bezier(.2,.8,.2,1); overflow: hidden; }
+  .pod.p1 .block { background: linear-gradient(180deg, var(--deep-red) 0%, #5a0e15 100%); border-top: 6px solid var(--anniversary-gold); color: var(--anniversary-gold); }
+  .pod.p2 .block { background: linear-gradient(180deg, var(--charcoal-navy-lighter) 0%, var(--charcoal-navy-light) 100%); border-top: 6px solid var(--graphite-grey-lightest); color: var(--graphite-grey-lightest); }
+  .pod.p3 .block { background: linear-gradient(180deg, var(--charcoal-navy-light) 0%, #2b313b 100%); border-top: 6px solid var(--deep-red-lighter); color: var(--deep-red-lightest); }
+  .pod.show.p1 .block { height: 18vh; } .pod.show.p2 .block { height: 13.5vh; } .pod.show.p3 .block { height: 10vh; }
+  .pod.p1.show .card { animation: glow 2s ease-in-out infinite alternate; }
+  @keyframes glow { from { filter: drop-shadow(0 0 0 rgba(195,154,83,0)); } to { filter: drop-shadow(0 0 18px rgba(195,154,83,.45)); } }
+  .growth { width: min(1500px, 92vw); flex: 1; min-height: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity .8s ease; margin-top: 1.6vh; }
+  .growth.show { opacity: 1; }
+  .growth h3 { font-size: 2.4vh; font-weight: 600; color: var(--muted); margin-bottom: .6vh; }
+  .growth svg { width: 100%; flex: 1; min-height: 0; }
+  .growth .ln { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; transition: stroke-dashoffset 2.4s ease; }
+  .growth text { font-family: var(--body); fill: var(--muted); font-size: 15px; }
+  .growth text.lbl { fill: var(--white); font-size: 17px; font-weight: 600; }
+  .growth .dot { stroke: #1d2633; stroke-width: 3; }
+  .fin-actions { position: absolute; right: 3vw; top: 3vh; z-index: 6; display: flex; gap: 12px; opacity: 0; transition: opacity .6s; }
+  .fin-actions.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -205,6 +249,7 @@
         <span class="final-banner hidden" id="finalBanner">Final standings</span>
       </div>
       <div class="row">
+        <button class="btn ghost hidden" id="finaleBtn">Winners ceremony</button>
         <button class="btn ghost" id="replayBtn">Replay leaderboard</button>
         <button class="btn" id="nextBtn">Back to timeline</button>
       </div>
@@ -248,6 +293,24 @@
   </div>
 </div>
 
+<!-- FINAL CEREMONY -->
+<div class="finale hidden" id="finale">
+  <canvas id="confetti"></canvas>
+  <div class="fin-top"><img src="img/mazi-20-years.svg" alt="Mazi 20 years"><div class="kick" id="finKick">Final standings</div></div>
+  <div class="cd" id="cd">
+    <div class="cd-lbl" id="cdLbl">The richest portfolio is...</div>
+    <div class="cd-ring"><svg viewBox="0 0 200 200"><circle class="trk" cx="100" cy="100" r="90"/><circle class="prog" id="cdProg" cx="100" cy="100" r="90" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/></svg><div class="cd-num" id="cdNum">5</div></div>
+  </div>
+  <div class="fin-cap hidden" id="finCap"></div>
+  <div class="podium hidden" id="podium">
+    <div class="pod p2" id="pod2"><div class="card"><div class="place">Runner-up</div><div class="nm"></div><div class="w"></div><div class="g"></div></div><div class="block">2</div></div>
+    <div class="pod p1" id="pod1"><div class="card"><div class="place">Winner</div><div class="nm"></div><div class="w"></div><div class="g"></div></div><div class="block">1</div></div>
+    <div class="pod p3" id="pod3"><div class="card"><div class="place">Third place</div><div class="nm"></div><div class="w"></div><div class="g"></div></div><div class="block">3</div></div>
+  </div>
+  <div class="growth hidden" id="growth"><h3 id="growthHead">How their wealth grew</h3><svg id="gchart" role="img" aria-label="Wealth over time for the top three"></svg></div>
+  <div class="fin-actions" id="finActions"><button class="btn ghost" id="finReplay">Replay ceremony</button><button class="btn" id="finClose">Full leaderboard</button></div>
+</div>
+
 <div class="gate hidden" id="gate">
   <div>
     <h2>Presenter sign-in</h2>
@@ -275,7 +338,7 @@
 <script type="module">
 import { createBackend } from "./js/backend.js";
 import { PUBLIC_PLAY_URL } from "./js/config.js";
-import { ASSETS, DEFAULT_SCENARIOS, STARTING_CAPITAL, START_YEAR, withYears, computeStandings, perfectForesight, formatRandShort, formatPct } from "./js/scenarios.js";
+import { ASSETS, DEFAULT_SCENARIOS, STARTING_CAPITAL, START_YEAR, withYears, computeStandings, perfectForesight, formatRand, formatRandShort, formatPct } from "./js/scenarios.js";
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -451,7 +514,12 @@ async function reveal() {
   const returns = c?.returns || state?.returns || {};
   const h = { roundId: state.roundId, scenarioId: state.scenarioId, year: state.year, fromYear: state.fromYear, years: state.years, title: state.title, returns, lesson: c?.lesson || "" };
   const hist = [...history().filter((x) => x.roundId !== state.roundId), h];
-  if (await writeState({ phase: "results", returns, lesson: h.lesson, history: hist })) { await ensureHistory(); renderResults(true); }
+  const done = new Set(hist.map((x) => x.scenarioId));
+  const isFinal = !chapters().some((c) => !done.has(c.id));
+  if (await writeState({ phase: isFinal ? "finale" : "results", returns, lesson: h.lesson, history: hist })) {
+    await ensureHistory(); renderResults(!isFinal);
+    if (isFinal) runFinale();
+  }
 }
 
 /* ---------------- results ---------------- */
@@ -465,6 +533,7 @@ function renderResults(animate) {
   $("resKick").textContent = `Chapter ${hist.length} of ${chapters().length} - results`;
   $("resTitle").textContent = `${last.year}: ${last.title}`;
   $("finalBanner").classList.toggle("hidden", !isFinal);
+  $("finaleBtn").classList.toggle("hidden", !isFinal);
   $("retHead").textContent = `What happened ${last.fromYear} to ${last.year} (${last.years} years)`;
   $("boardHead").textContent = `Top 10 - total wealth in ${last.year}`;
   const nxt = nextChapter();
@@ -523,6 +592,134 @@ async function goHome() {
   if (state && state.phase !== "idle") await writeState({ phase: "idle" });
   renderHome(); showScreen("sHome");
 }
+
+
+/* ---------------- final ceremony ---------------- */
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let finaleRun = 0, audio = null;
+function sfx(kind) {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = audio.currentTime, g = audio.createGain(); g.connect(audio.destination);
+    const tone = (f, start, dur, vol, type = "sine") => { const o = audio.createOscillator(), gg = audio.createGain(); o.type = type; o.frequency.value = f; o.connect(gg); gg.connect(g);
+      gg.gain.setValueAtTime(0, t0 + start); gg.gain.linearRampToValueAtTime(vol, t0 + start + 0.01); gg.gain.exponentialRampToValueAtTime(0.0001, t0 + start + dur); o.start(t0 + start); o.stop(t0 + start + dur + 0.05); };
+    if (kind === "tick") tone(880, 0, 0.18, 0.25, "triangle");
+    if (kind === "go") tone(1320, 0, 0.35, 0.3, "triangle");
+    if (kind === "place") { tone(523.3, 0, 0.5, 0.18); tone(659.3, 0.12, 0.6, 0.18); }
+    if (kind === "roll") for (let i = 0; i < 22; i++) tone(110 + (i % 2) * 8, i * 0.07, 0.09, 0.12 + i * 0.008, "square");
+    if (kind === "win") [[523.3, 0], [659.3, 0.1], [784, 0.2], [1046.5, 0.32]].forEach(([f, st]) => { tone(f, st, 1.6, 0.16, "triangle"); tone(f / 2, st, 1.6, 0.08); });
+  } catch {}
+}
+function countUp(el, to, ms = 1600) {
+  const from = STARTING_CAPITAL, t0 = performance.now();
+  const step = (now) => { const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = formatRand(from + (to - from) * e); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function confetti(ms = 6000) {
+  const cv = $("confetti"), ctx = cv.getContext("2d"); cv.width = innerWidth; cv.height = innerHeight;
+  const cols = ["#c39b53", "#fdcda2", "#77121b", "#ddb8b8", "#ffffff", "#a65b5c"];
+  const ps = Array.from({ length: 220 }, () => ({ x: innerWidth / 2 + (Math.random() - .5) * 300, y: innerHeight * .35, vx: (Math.random() - .5) * 18, vy: -Math.random() * 16 - 4, r: Math.random() * 6.28, vr: (Math.random() - .5) * .3, w: 8 + Math.random() * 8, h: 4 + Math.random() * 6, c: cols[(Math.random() * cols.length) | 0] }));
+  const t0 = performance.now(), run = finaleRun;
+  const step = (now) => {
+    if (run !== finaleRun) return ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    const fade = Math.min(1, Math.max(0, (ms - (now - t0)) / 1200));
+    for (const p of ps) { p.vy += 0.35; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.globalAlpha = fade; ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); ctx.restore(); }
+    if (now - t0 < ms) requestAnimationFrame(step); else ctx.clearRect(0, 0, cv.width, cv.height);
+  };
+  requestAnimationFrame(step);
+}
+function fillPod(n, p, total) {
+  const el = $("pod" + n);
+  el.querySelector(".nm").textContent = p ? p.name : "-";
+  el.querySelector(".w").textContent = formatRand(STARTING_CAPITAL);
+  el.querySelector(".g").textContent = p ? `${formatPct((p.wealth / STARTING_CAPITAL - 1) * 100)} since ${p.path?.[0]?.year ?? START_YEAR}` : "";
+}
+function drawGrowth(top, hist, ebr) {
+  const svg = $("gchart"); const W = 1400, H = 300, L = 90, R = 230, T = 16, B = 36;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const years = [START_YEAR, ...hist.map((h) => h.year)];
+  const x0 = years[0], x1 = years[years.length - 1];
+  const X = (y) => L + (y - x0) / (x1 - x0 || 1) * (W - L - R);
+  // class average at each step
+  const avg = [{ year: START_YEAR, wealth: STARTING_CAPITAL }];
+  for (let k = 1; k <= hist.length; k++) { const st = computeStandings(hist.slice(0, k), ebr); if (st.length) avg.push({ year: hist[k - 1].year, wealth: st.reduce((a, p) => a + p.wealth, 0) / st.length }); }
+  const maxW = Math.max(STARTING_CAPITAL, ...top.flatMap((p) => p.path.map((q) => q.wealth)), ...avg.map((q) => q.wealth));
+  const mag = Math.pow(10, Math.floor(Math.log10(maxW))); const stepV = [1, 2, 2.5, 5, 10].map((m) => m * mag / 2).find((v) => maxW / v <= 5) || mag;
+  const yMax = Math.ceil(maxW * 1.05 / stepV) * stepV;
+  const Y = (v) => T + (1 - v / yMax) * (H - T - B);
+  let g = "";
+  for (let v = 0; v <= yMax + 1; v += stepV) g += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(201,206,214,.12)"/><text x="${L - 12}" y="${Y(v) + 5}" text-anchor="end">${v === 0 ? "R0" : formatRandShort(v)}</text>`;
+  years.forEach((y) => g += `<text x="${X(y)}" y="${H - 8}" text-anchor="middle">${y}</text>`);
+  const path = (pts) => pts.map((q, i) => `${i ? "L" : "M"}${X(q.year).toFixed(1)} ${Y(q.wealth).toFixed(1)}`).join(" ");
+  g += `<path d="${path(avg)}" fill="none" stroke="rgba(201,206,214,.55)" stroke-width="2.5" stroke-dasharray="8 7"/>`;
+  const cols = ["#c39b53", "#e4e6e8", "#a65b5c"];
+  const labels = [];
+  top.forEach((p, i) => {
+    g += `<path class="ln" id="ln${i}" d="${path(p.path)}" stroke="${cols[i]}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>`;
+    p.path.forEach((q) => g += `<circle class="dot dt${i}" cx="${X(q.year)}" cy="${Y(q.wealth)}" r="6" fill="${cols[i]}" opacity="0"><title>${esc(p.name)} - ${q.year}: ${formatRand(q.wealth)}</title></circle>`);
+    const last = p.path[p.path.length - 1]; labels.push({ y: Y(last.wealth), i, text: `${p.name}  ${formatRandShort(last.wealth)}` });
+  });
+  const lastAvg = avg[avg.length - 1]; labels.push({ y: Y(lastAvg.wealth), i: -1, text: `Class average  ${formatRandShort(lastAvg.wealth)}` });
+  labels.sort((a, b) => a.y - b.y); for (let k = 1; k < labels.length; k++) if (labels[k].y - labels[k - 1].y < 24) labels[k].y = labels[k - 1].y + 24;
+  labels.forEach((l) => g += l.i < 0
+    ? `<text x="${W - R + 16}" y="${l.y + 5}">${esc(l.text)}</text>`
+    : `<g class="lb${l.i}" opacity="0"><circle cx="${W - R + 22}" cy="${l.y}" r="7" fill="${cols[l.i]}"/><text class="lbl" x="${W - R + 36}" y="${l.y + 6}">${esc(l.text)}</text></g>`);
+  svg.innerHTML = g;
+}
+async function runFinale() {
+  const run = ++finaleRun; const alive = () => run === finaleRun;
+  const hist = history(), ebr = entriesByRound(), list = computeStandings(hist, ebr), top = list.slice(0, 3);
+  const last = hist[hist.length - 1];
+  $("finKick").textContent = `${last?.year ?? ""} - Final standings`;
+  $("cdLbl").textContent = `The richest portfolio in ${last?.year ?? "the future"} is...`;
+  $("growthHead").textContent = `How their wealth grew, ${START_YEAR} to ${last?.year ?? ""}`;
+  ["pod1", "pod2", "pod3"].forEach((id) => $(id).classList.remove("show"));
+  $("growth").classList.remove("show"); $("growth").classList.add("hidden"); $("finActions").classList.remove("show");
+  $("podium").classList.add("hidden"); $("finCap").classList.add("hidden"); $("cd").classList.remove("hidden");
+  $("finale").classList.remove("hidden");
+  [1, 2, 3].forEach((n) => fillPod(n, top[n - 1]));
+  // countdown 5..1
+  for (let n = 5; n >= 1; n--) {
+    if (!alive()) return;
+    const num = $("cdNum"); num.textContent = n; num.classList.remove("pop"); void num.offsetWidth; num.classList.add("pop");
+    const prog = $("cdProg"); prog.style.transition = "none"; prog.style.strokeDashoffset = String((5 - n) / 5); void prog.getBoundingClientRect();
+    prog.style.transition = "stroke-dashoffset 1s linear"; prog.style.strokeDashoffset = String((6 - n) / 5);
+    sfx("tick"); await sleep(1000);
+  }
+  if (!alive()) return; sfx("go");
+  $("cd").classList.add("hidden"); $("podium").classList.remove("hidden"); $("finCap").classList.remove("hidden");
+  const reveal = async (n, caption, wait) => {
+    if (!alive() || !top[n - 1]) return;
+    $("finCap").textContent = caption; await sleep(wait);
+    if (!alive()) return;
+    $("pod" + n).classList.add("show"); sfx(n === 1 ? "win" : "place");
+    countUp($("pod" + n).querySelector(".w"), top[n - 1].wealth);
+    if (n === 1) confetti();
+  };
+  await reveal(3, "In third place...", 700); await sleep(2600);
+  await reveal(2, "The runner-up...", 300); await sleep(2600);
+  if (alive() && top[0]) { $("finCap").textContent = "And the winner is..."; sfx("roll"); await sleep(1700); }
+  await reveal(1, top[0] ? `Congratulations, ${top[0].name}!` : "", 0);
+  if (!alive()) return;
+  await sleep(2400); if (!alive()) return;
+  drawGrowth(top, hist, ebr);
+  $("growth").classList.remove("hidden"); void $("growth").offsetWidth; $("growth").classList.add("show");
+  for (let i = top.length - 1; i >= 0; i--) {
+    await sleep(500); if (!alive()) return;
+    $("ln" + i).style.strokeDashoffset = "0";
+    setTimeout(() => { document.querySelectorAll(`.dt${i}`).forEach((d) => d.setAttribute("opacity", "1")); document.querySelector(`.lb${i}`)?.setAttribute("opacity", "1"); }, 2300);
+  }
+  await sleep(2800); if (!alive()) return;
+  $("finActions").classList.add("show");
+  if (state?.phase === "finale") writeState({ phase: "results" });
+}
+function closeFinale() { finaleRun++; $("finale").classList.add("hidden"); if (state?.phase === "finale") writeState({ phase: "results" }); renderResults(true); }
+$("finClose").addEventListener("click", closeFinale);
+$("finReplay").addEventListener("click", () => runFinale());
+$("finaleBtn").addEventListener("click", () => runFinale());
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("finale").classList.contains("hidden")) closeFinale(); });
 
 /* ---------------- entries ---------------- */
 function watchRoundEntries() {
@@ -583,7 +780,7 @@ async function resume() {
   if (!state || !state.roundId || state.phase === "idle") { renderHome(); return showScreen("sHome"); }
   if (state.phase === "video") { const c = chapterById(state.scenarioId); return c ? playVideo(c) : openSubmissions(); }
   if (state.phase === "open" || state.phase === "closed") return renderOpen();
-  if (state.phase === "results") return renderResults(false);
+  if (state.phase === "results" || state.phase === "finale") return renderResults(false);
 }
 
 (async () => {

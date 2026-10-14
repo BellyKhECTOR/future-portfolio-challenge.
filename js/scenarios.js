@@ -95,7 +95,8 @@ export function computeStandings(history, entriesByRound) {
     const byUid = new Map(list.map((e) => [e.uid, e]));
     for (const e of list) {
       if (!players.has(e.uid)) {
-        players.set(e.uid, { uid: e.uid, name: e.name, wealth: STARTING_CAPITAL, alloc: e.alloc, joinedAt: e.submittedAt || 0, chapters: 0 });
+        players.set(e.uid, { uid: e.uid, name: e.name, wealth: STARTING_CAPITAL, alloc: e.alloc, joinedAt: e.submittedAt || 0, chapters: 0,
+          path: [{ year: h.fromYear ?? START_YEAR, wealth: STARTING_CAPITAL }] });
       }
     }
     for (const p of players.values()) {
@@ -105,6 +106,7 @@ export function computeStandings(history, entriesByRound) {
       p.wealth = portfolioValue(p.alloc, h.returns, p.wealth);
       p.rebalanced = !!e;
       p.chapters += 1;
+      p.path.push({ year: h.year, wealth: p.wealth });
     }
   }
   return [...players.values()].sort((a, b) => b.wealth - a.wealth || a.joinedAt - b.joinedAt);
