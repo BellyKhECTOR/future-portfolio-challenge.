@@ -103,6 +103,32 @@
   .gate h2 { font-size: 30px; margin-bottom: 10px; }
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--deep-red); color: var(--white); padding: 12px 20px; border-radius: 12px; font-weight: 600; z-index: 40; }
   @media (max-width: 1000px) { .qr-layout, .res-layout { grid-template-columns: 1fr; } }
+
+  /* Timeline */
+  .tl { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; position: relative; }
+  .tl::before { content: ""; position: absolute; left: 4%; right: 4%; top: 46px; height: 3px; background: var(--line); z-index: 0; }
+  .node { position: relative; z-index: 1; text-align: left; background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--charcoal-navy-lighter); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 6px; min-height: 200px; color: var(--text); }
+  .node .yr { font-family: var(--condensed); font-size: 40px; font-weight: 600; letter-spacing: .02em; line-height: 1; }
+  .node .span { font-family: var(--condensed); text-transform: uppercase; letter-spacing: .1em; font-size: 13px; color: var(--muted); }
+  .node h3 { font-size: 20px; }
+  .node p { margin: 0; color: var(--muted); font-size: 14px; flex: 1; }
+  .node .st { font-weight: 700; font-size: 14px; }
+  .node.start { border-top-color: var(--anniversary-gold); }
+  .node.done { border-top-color: var(--deep-red); }
+  .node.done .st { color: var(--anniversary-gold); }
+  .node.next { border: 2px solid var(--warm-sand); border-top: 4px solid var(--warm-sand); box-shadow: 0 10px 40px rgba(253,205,162,.12); }
+  .node.next .st { color: var(--warm-sand); }
+  .node.locked { opacity: .55; }
+  .lb-row { grid-template-columns: 52px 1fr 54px 140px 96px 28px !important; }
+  .lb-row .mv { text-align: center; font-weight: 700; font-size: 14px; }
+  .lb-row .mv.up { color: var(--anniversary-gold); }
+  .lb-row .mv.down { color: var(--deep-red-lightest); }
+  .lb-row .mv.new { color: var(--warm-sand); font-size: 12px; letter-spacing: .06em; }
+  .board-head { display: grid; grid-template-columns: 52px 1fr 54px 140px 96px 28px; gap: 14px; padding: 0 14px 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .board-head span:nth-child(n+3) { text-align: right; }
+  .board-head span:nth-child(3) { text-align: center; }
+  .final-banner { display: inline-block; margin-top: 8px; padding: 6px 14px; border-radius: 999px; background: var(--deep-red); color: var(--white); font-weight: 600; }
+  @media (max-width: 1100px) { .tl { grid-template-columns: repeat(2, 1fr); } .tl::before { display: none; } }
 </style>
 </head>
 <body>
@@ -112,19 +138,24 @@
   <div class="title">Future Portfolio Challenge</div>
   <span id="modeBadge" class="badge">Connecting</span>
   <div class="sp"></div>
-  <button class="btn ghost small" id="homeBtn">Scenarios</button>
+  <button class="btn ghost small" id="homeBtn">Timeline</button>
   <button class="btn ghost small" id="settingsBtn">Settings</button>
   <button class="btn ghost small" id="fsBtn">Full screen</button>
 </div>
 
 <div class="stage">
-  <!-- HOME -->
+  <!-- HOME / TIMELINE -->
   <section id="sHome" class="screen">
     <div class="hero">
-      <h1>The future is coming.<br><em>How would you invest R10 million?</em></h1>
-      <p>Pick a scenario to start a round. The video plays, a QR code appears, learners build their portfolios on their phones, and the top 10 make the leaderboard.</p>
+      <h1>The future is coming.<br><em>Grow R10 million from 2026 to 2055.</em></h1>
+      <p>One journey, four chapters. Each video jumps forward in time. Learners rebalance on their phones, and whatever they have grown carries into the next chapter. The richest portfolio in 2055 wins.</p>
     </div>
-    <div class="grid" id="scGrid"></div>
+    <div class="tl" id="timeline"></div>
+    <div class="row" style="margin-top:28px">
+      <button class="btn" id="nextChapterBtn">Start 2031</button>
+      <button class="btn ghost hidden" id="standingsBtn">View standings</button>
+      <button class="btn ghost" id="newGameBtn">New game</button>
+    </div>
   </section>
 
   <!-- QR / OPEN -->
@@ -135,16 +166,17 @@
         <div class="url" id="playUrl"></div>
       </div>
       <div class="qr-info">
-        <div class="kick" id="openKick">Scan to build your portfolio</div>
+        <div class="kick" id="openKick"></div>
         <h1 id="openTitle"></h1>
         <p class="tag" id="openTag"></p>
         <ol class="steps">
           <li>Scan the QR code with your phone camera</li>
-          <li>Split your R10 million across the asset classes</li>
+          <li id="stepTwo">Split your money across the asset classes</li>
           <li>Hit submit before the timer runs out</li>
         </ol>
         <div class="stats">
           <div class="stat"><div class="v" id="subCount">0</div><div class="l">portfolios submitted</div></div>
+          <div class="stat" id="playersBox"><div class="v" id="playerCount">0</div><div class="l">players in the game</div></div>
           <div class="stat" id="timerBox"><div class="v" id="timer">--:--</div><div class="l">time left</div></div>
         </div>
         <div class="ticker" id="ticker"></div>
@@ -167,27 +199,29 @@
   <section id="sResults" class="screen hidden">
     <div class="res-head">
       <div>
-        <div class="kick">Results</div>
+        <div class="kick" id="resKick">Results</div>
         <h1 id="resTitle"></h1>
+        <span class="final-banner hidden" id="finalBanner">Final standings</span>
       </div>
       <div class="row">
         <button class="btn ghost" id="replayBtn">Replay leaderboard</button>
-        <button class="btn" id="nextBtn">Next scenario</button>
+        <button class="btn" id="nextBtn">Back to timeline</button>
       </div>
     </div>
     <div class="res-layout">
       <div class="panel">
-        <h2>What happened over 5 years</h2>
+        <h2 id="retHead">What happened</h2>
         <div id="returns"></div>
         <div class="lesson" id="lesson"></div>
         <div class="mini-stats">
-          <div class="stat"><div class="v" id="stN">0</div><div class="l">portfolios</div></div>
+          <div class="stat"><div class="v" id="stN">0</div><div class="l">players</div></div>
           <div class="stat"><div class="v" id="stAvg">-</div><div class="l">class average</div></div>
-          <div class="stat"><div class="v" id="stBest">-</div><div class="l">best possible</div></div>
+          <div class="stat"><div class="v" id="stBest">-</div><div class="l">perfect foresight</div></div>
         </div>
       </div>
       <div class="panel">
-        <h2>Top 10 portfolios</h2>
+        <h2 id="boardHead">Top 10 - total wealth</h2>
+        <div class="board-head"><span>#</span><span>Investor</span><span>Move</span><span>Wealth</span><span>Since 2026</span><span></span></div>
         <div id="board"></div>
       </div>
     </div>
@@ -224,15 +258,15 @@
 
 <dialog id="settings">
   <div class="dlg-head">
-    <h2>Scenarios and returns</h2>
+    <h2>Chapters and returns</h2>
     <div class="row">
-      <button class="btn ghost small" id="addSc">Add scenario</button>
+      <button class="btn ghost small" id="addSc">Add chapter</button>
       <button class="btn ghost small" id="resetSc">Reset to defaults</button>
       <button class="btn small" id="saveSc">Save</button>
     </div>
   </div>
   <div class="dlg-body">
-    <p class="muted" style="margin-top:0">Returns are cumulative over 5 years, in %. Video paths are relative to the site (put files in the <code>videos</code> folder) or a full URL. These settings are saved on this computer only.</p>
+    <p class="muted" style="margin-top:0">Chapters are played in this order, starting from 2026. Returns are the total % change over each chapter's period (e.g. 2031 to 2046 is 15 years). Video paths are relative to the site or a full URL. Saved on this computer only - change them before starting a game.</p>
     <div id="edList"></div>
   </div>
 </dialog>
@@ -240,39 +274,42 @@
 <script type="module">
 import { createBackend } from "./js/backend.js";
 import { PUBLIC_PLAY_URL } from "./js/config.js";
-import { ASSETS, DEFAULT_SCENARIOS, STARTING_CAPITAL, portfolioValue, formatRandShort, formatPct } from "./js/scenarios.js";
+import { ASSETS, DEFAULT_SCENARIOS, STARTING_CAPITAL, START_YEAR, withYears, computeStandings, perfectForesight, formatRandShort, formatPct } from "./js/scenarios.js";
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const toast = (msg) => { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), 4000); };
+const newId = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 
 let backend, state = null, entries = [], unsubEntries = null, entriesRound = null, timerEnd = null, timerInt = null;
-const localVideos = {}; // scenarioId -> object URL chosen from computer
-const played = new Set(JSON.parse(sessionStorage.getItem("fpc:played") || "[]"));
+const localVideos = {};
+const cache = {}; // roundId -> entries (completed rounds)
 
-/* ---------------- scenarios (local overrides) ---------------- */
+/* ---------------- chapters (local overrides) ---------------- */
+const SC_KEY = "fpc:chapters:v2";
 function loadScenarios() {
-  try { const s = JSON.parse(localStorage.getItem("fpc:scenarios")); if (Array.isArray(s) && s.length) return s; } catch {}
+  try { const s = JSON.parse(localStorage.getItem(SC_KEY)); if (Array.isArray(s) && s.length) return s; } catch {}
   return structuredClone(DEFAULT_SCENARIOS);
 }
 let scenarios = loadScenarios();
-const scenarioById = (id) => scenarios.find((s) => s.id === id);
+const chapters = () => withYears(scenarios);
+const chapterById = (id) => chapters().find((c) => c.id === id);
+const history = () => state?.history || [];
 
-function renderHome() {
-  $("scGrid").innerHTML = scenarios.map((s, i) => `
-    <button class="sc ${played.has(s.id) ? "done" : ""}" data-id="${esc(s.id)}">
-      <span class="num">SCENARIO ${i + 1}${played.has(s.id) ? " - PLAYED" : ""}</span>
-      <h3>${esc(s.title)}</h3>
-      <p>${esc(s.tagline)}</p>
-      <span class="go">Start round &rarr;</span>
-    </button>`).join("");
+/* ---------------- data helpers ---------------- */
+function entriesByRound() {
+  const m = { ...cache };
+  if (state?.roundId) m[state.roundId] = entries;
+  return m;
 }
-$("scGrid").addEventListener("click", (e) => { const b = e.target.closest(".sc"); if (b) startRound(b.dataset.id); });
+async function ensureHistory() {
+  const jobs = history().filter((h) => h.roundId !== state?.roundId && !cache[h.roundId])
+    .map(async (h) => { cache[h.roundId] = await backend.getEntries(h.roundId); });
+  await Promise.all(jobs);
+}
 
 /* ---------------- screens ---------------- */
-function showScreen(id) {
-  ["sHome", "sOpen", "sResults"].forEach((s) => $(s).classList.toggle("hidden", s !== id));
-}
+function showScreen(id) { ["sHome", "sOpen", "sResults"].forEach((s) => $(s).classList.toggle("hidden", s !== id)); }
 
 async function writeState(patch) {
   const next = { ...(state || {}), ...patch, updatedAt: Date.now() };
@@ -280,27 +317,54 @@ async function writeState(patch) {
   catch (e) { console.error(e); toast("Could not update the game. Check you're signed in as the presenter."); return false; }
 }
 
+/* ---------------- timeline ---------------- */
+function nextChapter() {
+  const done = new Set(history().map((h) => h.scenarioId));
+  return chapters().find((c) => !done.has(c.id)) || null;
+}
+function renderHome() {
+  const done = new Map(history().map((h) => [h.scenarioId, h]));
+  const nxt = nextChapter();
+  const list = chapters();
+  $("timeline").innerHTML = `
+    <div class="node start"><div class="span">Today</div><div class="yr">${START_YEAR}</div><h3>The start</h3><p>Every learner gets R10 million to invest.</p><div class="st">R10m each</div></div>` +
+    list.map((c, i) => {
+      const cls = done.has(c.id) ? "done" : c.id === nxt?.id ? "next" : "locked";
+      const st = done.has(c.id) ? "Played" : c.id === nxt?.id ? "Up next" : "Locked";
+      return `<div class="node ${cls}"><div class="span">Chapter ${i + 1} - ${c.years} years later</div><div class="yr">${c.year}</div><h3>${esc(c.title)}</h3><p>${esc(c.tagline)}</p><div class="st">${st}</div></div>`;
+    }).join("");
+  $("nextChapterBtn").classList.toggle("hidden", !nxt);
+  if (nxt) $("nextChapterBtn").textContent = history().length ? `Continue to ${nxt.year}` : `Start the journey: ${nxt.year}`;
+  $("standingsBtn").classList.toggle("hidden", !history().length);
+  $("standingsBtn").textContent = nxt ? "View standings" : "Final standings";
+}
+$("nextChapterBtn").addEventListener("click", () => { const c = nextChapter(); if (c) startRound(c); });
+$("standingsBtn").addEventListener("click", async () => { await ensureHistory(); renderResults(true); });
+$("newGameBtn").addEventListener("click", async () => {
+  if (history().length && !confirm("Start a new game? Everyone goes back to R10 million in 2026.")) return;
+  if (await writeState({ gameId: newId("g"), history: [], phase: "idle", roundId: null, scenarioId: null, returns: null, lesson: null })) { entries = []; renderHome(); showScreen("sHome"); }
+});
+
 /* ---------------- round flow ---------------- */
-async function startRound(id) {
-  const sc = scenarioById(id); if (!sc) return;
+async function startRound(c) {
   const ok = await writeState({
-    roundId: "r" + Date.now().toString(36), scenarioId: sc.id, title: sc.title, tagline: sc.tagline,
+    gameId: state?.gameId || newId("g"), history: history(),
+    roundId: newId("r"), scenarioId: c.id, chapter: chapters().findIndex((x) => x.id === c.id) + 1, chapters: chapters().length,
+    title: c.title, tagline: c.tagline, year: c.year, fromYear: c.fromYear, years: c.years,
     phase: "video", returns: null, lesson: null,
   });
-  if (!ok) return;
-  played.add(sc.id); sessionStorage.setItem("fpc:played", JSON.stringify([...played]));
-  playVideo(sc);
+  if (ok) playVideo(c);
 }
 
-function playVideo(sc) {
+function playVideo(c) {
   const v = $("video");
   $("videoWrap").classList.remove("hidden");
   $("videoMissing").classList.add("hidden");
   $("videoCtrl").classList.remove("hidden");
-  v.src = localVideos[sc.id] || sc.video || "";
+  v.src = localVideos[c.id] || c.video || "";
   v.onerror = () => {
-    $("vmTitle").textContent = sc.title;
-    $("vmPath").textContent = sc.video ? `Couldn't load "${sc.video}". Choose the file, or skip straight to the portfolio builder.` : "No video set for this scenario.";
+    $("vmTitle").textContent = `${c.year} - ${c.title}`;
+    $("vmPath").textContent = c.video ? `Couldn't load "${c.video}". Choose the file, or skip straight to the portfolio builder.` : "No video set for this chapter.";
     $("videoMissing").classList.remove("hidden");
     $("videoCtrl").classList.add("hidden");
   };
@@ -311,18 +375,18 @@ function playVideo(sc) {
 function useLocalFile(file) {
   if (!file || !state) return;
   localVideos[state.scenarioId] = URL.createObjectURL(file);
-  playVideo(scenarioById(state.scenarioId) || { id: state.scenarioId });
+  playVideo(chapterById(state.scenarioId) || { id: state.scenarioId, title: state.title, year: state.year });
 }
 $("vmFile").addEventListener("change", (e) => useLocalFile(e.target.files[0]));
 $("vFile").addEventListener("change", (e) => useLocalFile(e.target.files[0]));
 $("vmSkip").addEventListener("click", () => openSubmissions());
 $("vSkip").addEventListener("click", () => openSubmissions());
-
 function closeVideo() { const v = $("video"); v.pause(); v.onerror = null; v.removeAttribute("src"); v.load(); $("videoWrap").classList.add("hidden"); }
 
 async function openSubmissions() {
   closeVideo();
   if (state?.phase !== "open") { if (!(await writeState({ phase: "open" }))) return; }
+  await ensureHistory();
   renderOpen();
 }
 
@@ -330,14 +394,16 @@ function playUrl() { return PUBLIC_PLAY_URL || new URL("play.html", location.hre
 
 function renderOpen() {
   showScreen("sOpen");
-  $("openTitle").textContent = state?.title || "";
+  $("openKick").textContent = `Chapter ${state?.chapter || ""} of ${state?.chapters || ""} - ${state?.fromYear} to ${state?.year} (${state?.years} years)`;
+  $("openTitle").textContent = `${state?.year}: ${state?.title || ""}`;
   $("openTag").textContent = state?.tagline || "";
+  $("stepTwo").textContent = history().length ? "Rebalance your wealth - it carries into this chapter" : "Split your R10 million across the asset classes";
   const url = playUrl();
   $("playUrl").textContent = url.replace(/^https?:\/\//, "");
   $("qr").innerHTML = "";
   if (window.QRCode) new QRCode($("qr"), { text: url, width: 440, height: 440, colorDark: "#1d2633", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
   else $("qr").innerHTML = '<p style="color:#1d2633">QR library could not load - share the link below.</p>';
-  if (backend.mode === "demo") $("openKick").textContent = "Demo mode - open the link in other browser tabs";
+  if (backend.mode === "demo") $("openKick").textContent += " - demo mode";
   const closed = state?.phase === "closed";
   $("closeBtn").classList.toggle("hidden", closed);
   $("revealBtn").classList.toggle("hidden", !closed);
@@ -350,6 +416,10 @@ function renderOpen() {
 
 function renderTicker() {
   $("subCount").textContent = entries.length;
+  const prior = computeStandings(history(), entriesByRound());
+  const ids = new Set([...prior.map((p) => p.uid), ...entries.map((e) => e.uid)]);
+  $("playerCount").textContent = ids.size;
+  $("playersBox").classList.toggle("hidden", !history().length);
   const recent = [...entries].sort((a, b) => b.submittedAt - a.submittedAt).slice(0, 18);
   $("ticker").innerHTML = recent.map((e) => `<span class="chip">${esc(e.name)}</span>`).join("");
 }
@@ -376,61 +446,75 @@ $("closeBtn").addEventListener("click", closeSubmissions);
 $("revealBtn").addEventListener("click", reveal);
 
 async function reveal() {
-  const sc = scenarioById(state?.scenarioId);
-  const returns = sc?.returns || state?.returns || {};
-  if (await writeState({ phase: "results", returns, lesson: sc?.lesson || "" })) renderResults(true);
+  const c = chapterById(state?.scenarioId);
+  const returns = c?.returns || state?.returns || {};
+  const h = { roundId: state.roundId, scenarioId: state.scenarioId, year: state.year, fromYear: state.fromYear, years: state.years, title: state.title, returns, lesson: c?.lesson || "" };
+  const hist = [...history().filter((x) => x.roundId !== state.roundId), h];
+  if (await writeState({ phase: "results", returns, lesson: h.lesson, history: hist })) { await ensureHistory(); renderResults(true); }
 }
 
 /* ---------------- results ---------------- */
-function ranked() {
-  const r = state?.returns || {};
-  return entries
-    .map((e) => ({ ...e, value: portfolioValue(e.alloc, r) }))
-    .sort((a, b) => b.value - a.value || a.submittedAt - b.submittedAt);
-}
-
 function renderResults(animate) {
   showScreen("sResults");
-  const r = state?.returns || {};
-  $("resTitle").textContent = state?.title || "";
+  const hist = history();
+  const last = hist[hist.length - 1];
+  if (!last) { renderHome(); showScreen("sHome"); return; }
+  const r = last.returns || {};
+  const isFinal = !nextChapter();
+  $("resKick").textContent = `Chapter ${hist.length} of ${chapters().length} - results`;
+  $("resTitle").textContent = `${last.year}: ${last.title}`;
+  $("finalBanner").classList.toggle("hidden", !isFinal);
+  $("retHead").textContent = `What happened ${last.fromYear} to ${last.year} (${last.years} years)`;
+  $("boardHead").textContent = `Top 10 - total wealth in ${last.year}`;
+  const nxt = nextChapter();
+  $("nextBtn").textContent = nxt ? `Continue to ${nxt.year}` : "Back to timeline";
+
   const maxAbs = Math.max(10, ...ASSETS.map((a) => Math.abs(r[a.id] || 0)));
   $("returns").innerHTML = [...ASSETS].sort((a, b) => (r[b.id] || 0) - (r[a.id] || 0)).map((a, i) => {
     const v = r[a.id] || 0, w = (Math.abs(v) / maxAbs) * 50;
     const pos = v >= 0 ? `left:50%;width:${w}%;transform-origin:left` : `right:50%;width:${w}%;transform-origin:right`;
     return `<div class="ret"><span>${a.name}</span><div class="track"><div class="fill" style="${pos};background:${v >= 0 ? a.colour : "var(--red-bar)"};animation-delay:${i * 0.08}s"></div></div><span class="val ${v >= 0 ? "pos" : "neg"}">${formatPct(v)}</span></div>`;
   }).join("");
-  $("lesson").textContent = state?.lesson || "";
-  $("lesson").classList.toggle("hidden", !state?.lesson);
+  $("lesson").textContent = last.lesson || "";
+  $("lesson").classList.toggle("hidden", !last.lesson);
 
-  const list = ranked();
-  const best = Math.max(...ASSETS.map((a) => r[a.id] || 0));
+  const ebr = entriesByRound();
+  const list = computeStandings(hist, ebr);
+  const prevRank = new Map(computeStandings(hist.slice(0, -1), ebr).map((p, i) => [p.uid, i + 1]));
   $("stN").textContent = list.length;
-  $("stAvg").textContent = list.length ? formatRandShort(list.reduce((s, e) => s + e.value, 0) / list.length) : "-";
-  $("stBest").textContent = formatRandShort(STARTING_CAPITAL * (1 + best / 100));
+  $("stAvg").textContent = list.length ? formatRandShort(list.reduce((s, p) => s + p.wealth, 0) / list.length) : "-";
+  $("stBest").textContent = formatRandShort(perfectForesight(hist));
 
   const top = list.slice(0, 10);
-  if (!top.length) { $("board").innerHTML = '<div class="empty">No portfolios were submitted this round.</div>'; return; }
+  if (!top.length) { $("board").innerHTML = '<div class="empty">No portfolios yet.</div>'; return; }
   const n = top.length;
-  $("board").innerHTML = top.map((e, i) => {
-    const gain = (e.value / STARTING_CAPITAL - 1) * 100;
-    const mix = ASSETS.map((a) => `<span style="width:${e.alloc[a.id] || 0}%;background:${a.colour}"></span>`).join("");
+  $("board").innerHTML = top.map((p, i) => {
+    const total = (p.wealth / STARTING_CAPITAL - 1) * 100;
+    const mix = ASSETS.map((a) => `<span style="width:${p.alloc?.[a.id] || 0}%;background:${a.colour}"></span>`).join("");
+    const pr = prevRank.get(p.uid);
+    const mv = hist.length < 2 ? "" : !pr ? '<span class="mv new">NEW</span>' : pr > i + 1 ? `<span class="mv up">&#9650;${pr - i - 1}</span>` : pr < i + 1 ? `<span class="mv down">&#9660;${i + 1 - pr}</span>` : '<span class="mv">-</span>';
     const delay = animate ? (n - 1 - i) * 0.35 + 0.6 : 0;
     return `<div class="lb-row r${i + 1}" style="animation-delay:${delay}s">
       <div class="rk">${i + 1}</div>
-      <div style="min-width:0"><div class="nm">${esc(e.name)}</div><div class="mix">${mix}</div></div>
-      <div class="val">${formatRandShort(e.value)}</div>
-      <div class="gn ${gain >= 0 ? "pos" : "neg"}">${formatPct(gain)}</div>
-      <button class="x" data-uid="${esc(e.uid)}" title="Remove this entry">&times;</button>
+      <div style="min-width:0"><div class="nm">${esc(p.name)}</div><div class="mix">${mix}</div></div>
+      <div class="mv">${mv}</div>
+      <div class="val">${formatRandShort(p.wealth)}</div>
+      <div class="gn ${total >= 0 ? "pos" : "neg"}">${formatPct(total)}</div>
+      <button class="x" data-uid="${esc(p.uid)}" title="Remove this player">&times;</button>
     </div>`;
   }).join("");
 }
 $("board").addEventListener("click", async (e) => {
   const b = e.target.closest(".x"); if (!b || !state) return;
-  if (!confirm("Remove this entry from the leaderboard?")) return;
-  try { await backend.deleteEntry(state.roundId, b.dataset.uid); } catch { toast("Could not remove that entry."); }
+  if (!confirm("Remove this player from the game?")) return;
+  try {
+    for (const h of history()) { await backend.deleteEntry(h.roundId, b.dataset.uid); if (cache[h.roundId]) cache[h.roundId] = cache[h.roundId].filter((x) => x.uid !== b.dataset.uid); }
+    entries = entries.filter((x) => x.uid !== b.dataset.uid);
+    renderResults(false);
+  } catch { toast("Could not remove that player."); }
 });
 $("replayBtn").addEventListener("click", () => renderResults(true));
-$("nextBtn").addEventListener("click", goHome);
+$("nextBtn").addEventListener("click", () => { const c = nextChapter(); if (c) startRound(c); else goHome(); });
 $("homeBtn").addEventListener("click", goHome);
 
 async function goHome() {
@@ -446,7 +530,6 @@ function watchRoundEntries() {
   unsubEntries = backend.watchEntries(state.roundId, (list) => {
     entries = list;
     if (!$("sOpen").classList.contains("hidden")) renderTicker();
-    if (!$("sResults").classList.contains("hidden")) renderResults(false);
   });
 }
 
@@ -455,19 +538,20 @@ function renderSettings() {
   $("edList").innerHTML = scenarios.map((s, i) => `
     <div class="ed" data-i="${i}">
       <div class="f">
+        <div><label>Year</label><input type="number" data-k="year" value="${esc(s.year)}"></div>
         <div><label>Title</label><input data-k="title" value="${esc(s.title)}"></div>
-        <div><label>Video file or URL</label><input data-k="video" value="${esc(s.video)}"></div>
+        <div class="full"><label>Video file or URL</label><input data-k="video" value="${esc(s.video)}"></div>
         <div class="full"><label>Tagline (shown to learners)</label><input data-k="tagline" value="${esc(s.tagline)}"></div>
         <div class="full"><label>Lesson (shown at the reveal)</label><input data-k="lesson" value="${esc(s.lesson)}"></div>
       </div>
       <div class="rets">${ASSETS.map((a) => `<div><label>${a.name} %</label><input type="number" data-r="${a.id}" value="${s.returns?.[a.id] ?? 0}"></div>`).join("")}</div>
-      <div style="margin-top:10px;text-align:right"><button class="btn ghost small" data-del="${i}">Delete scenario</button></div>
+      <div style="margin-top:10px;text-align:right"><button class="btn ghost small" data-del="${i}">Delete chapter</button></div>
     </div>`).join("");
 }
 function readSettings() {
   return [...document.querySelectorAll(".ed")].map((el, i) => {
     const s = { ...scenarios[i], returns: {} };
-    el.querySelectorAll("[data-k]").forEach((inp) => (s[inp.dataset.k] = inp.value.trim()));
+    el.querySelectorAll("[data-k]").forEach((inp) => (s[inp.dataset.k] = inp.dataset.k === "year" ? Number(inp.value) : inp.value.trim()));
     el.querySelectorAll("[data-r]").forEach((inp) => (s.returns[inp.dataset.r] = Number(inp.value) || 0));
     return s;
   });
@@ -475,26 +559,28 @@ function readSettings() {
 $("settingsBtn").addEventListener("click", () => { renderSettings(); $("settings").showModal(); });
 $("addSc").addEventListener("click", () => {
   scenarios = readSettings();
-  scenarios.push({ id: "sc-" + Date.now().toString(36), title: "New scenario", tagline: "", video: "videos/", lesson: "", returns: Object.fromEntries(ASSETS.map((a) => [a.id, 0])) });
+  const lastYear = Number(scenarios[scenarios.length - 1]?.year) || START_YEAR;
+  scenarios.push({ id: "sc-" + Date.now().toString(36), year: lastYear + 5, title: "New chapter", tagline: "", video: "videos/", lesson: "", returns: Object.fromEntries(ASSETS.map((a) => [a.id, 0])) });
   renderSettings();
 });
 $("edList").addEventListener("click", (e) => {
   const d = e.target.closest("[data-del]"); if (!d) return;
   scenarios = readSettings(); scenarios.splice(+d.dataset.del, 1); renderSettings();
 });
-$("resetSc").addEventListener("click", () => { if (confirm("Reset all scenarios to the defaults?")) { scenarios = structuredClone(DEFAULT_SCENARIOS); renderSettings(); } });
+$("resetSc").addEventListener("click", () => { if (confirm("Reset all chapters to the defaults?")) { scenarios = structuredClone(DEFAULT_SCENARIOS); renderSettings(); } });
 $("saveSc").addEventListener("click", () => {
-  scenarios = readSettings();
-  localStorage.setItem("fpc:scenarios", JSON.stringify(scenarios));
+  scenarios = readSettings().sort((a, b) => a.year - b.year);
+  try { localStorage.setItem(SC_KEY, JSON.stringify(scenarios)); } catch {}
   $("settings").close(); renderHome();
 });
 
 $("fsBtn").addEventListener("click", () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.());
 
 /* ---------------- boot ---------------- */
-function resume() {
+async function resume() {
+  await ensureHistory().catch(() => {});
   if (!state || !state.roundId || state.phase === "idle") { renderHome(); return showScreen("sHome"); }
-  if (state.phase === "video") { const sc = scenarioById(state.scenarioId); return sc ? playVideo(sc) : openSubmissions(); }
+  if (state.phase === "video") { const c = chapterById(state.scenarioId); return c ? playVideo(c) : openSubmissions(); }
   if (state.phase === "open" || state.phase === "closed") return renderOpen();
   if (state.phase === "results") return renderResults(false);
 }

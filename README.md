@@ -47,17 +47,24 @@ Either:
 - Name your MP4 files `ai-boom.mp4`, `green-shift.mp4`, `global-shock.mp4`, `sa-rising.mp4`, put them in `videos/` and push them to GitHub, or
 - On the night, click **Choose video from computer** when a round starts. Nothing is uploaded; it plays from your laptop.
 
-You can change titles, taglines, video names, lessons and returns in **Settings** on the presenter screen (saved on that laptop) or permanently in `js/scenarios.js`.
+You can change years, titles, taglines, video names, lessons and returns in **Settings** on the presenter screen (saved on that laptop) or permanently in `js/scenarios.js`.
 
 ## Running a session
 
-1. Open the site on the projector laptop in Edge, sign in with Google, press **Full screen**.
-2. Click a scenario. The video plays full screen; the round state tells phones to wait.
-3. When the video ends (or you press **Skip to QR code**), the QR appears and submissions open. Optionally start a 2, 3 or 5 minute timer.
-4. Learners scan, enter a name, split R10m to exactly 100% and submit. Names pop up on screen as they arrive. They can change their portfolio until you close submissions.
-5. Press **Close submissions**, then **Reveal results**. The scenario's returns appear, the top 10 animate in from 10th to 1st, and each phone shows that learner's own result and rank.
-6. Hover over a leaderboard row and press x to remove a rude name.
-7. **Next scenario** returns to the scenario list for another round.
+The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 2055**. Every learner starts with R10 million, and whatever they grow carries into the next chapter. The richest portfolio in 2055 wins.
+
+1. Open the site on the projector laptop in Edge, sign in with Google, press **Full screen**. Press **New game** to start fresh.
+2. Press **Start the journey: 2031**. The video plays full screen.
+3. When the video ends (or you press **Skip to QR code**), the QR appears and submissions open. Optionally start a timer.
+4. Learners scan, enter a name and split their wealth to exactly 100%. From chapter 2 onwards their phone shows what their portfolio is worth and pre-fills their last mix.
+5. Press **Close submissions**, then **Reveal results**. The chapter's returns appear and the top 10 by **total wealth** animate in, with arrows showing who moved up or down. Each phone shows that learner's wealth, change this chapter, total since 2026 and rank.
+6. Press **Continue to 2046** and repeat. After 2055 the board is marked **Final standings**.
+
+Rules of the journey:
+- A learner who doesn't submit in a chapter keeps their previous mix.
+- A learner who joins late starts with R10 million in the chapter they join.
+- Hover over a leaderboard row and press x to remove a player from the whole game.
+- **Timeline** goes back to the overview at any point; **View standings** shows the latest leaderboard.
 
 ## Design notes
 

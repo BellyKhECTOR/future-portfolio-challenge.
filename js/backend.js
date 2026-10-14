@@ -58,6 +58,13 @@ async function createFirebaseBackend() {
         }));
       }, (e) => console.error(e));
     },
+    async getEntries(roundId) {
+      const snap = await fs.getDocs(entriesCol(roundId));
+      return snap.docs.map((d) => {
+        const x = d.data();
+        return { uid: d.id, name: x.name, alloc: x.alloc, submittedAt: x.submittedAt?.toMillis?.() ?? 0 };
+      });
+    },
     async submitEntry(roundId, uid, entry) {
       await fs.setDoc(fs.doc(db, "rounds", roundId, "entries", uid), {
         name: entry.name, alloc: entry.alloc, submittedAt: fs.serverTimestamp(),
@@ -99,6 +106,9 @@ function createDemoBackend() {
         const j = JSON.stringify(m);
         if (j !== last) { last = j; cb(Object.entries(m).map(([k, v]) => ({ uid: k, ...v }))); }
       });
+    },
+    async getEntries(roundId) {
+      return Object.entries(read("entries:" + roundId, {})).map(([k, v]) => ({ uid: k, ...v }));
     },
     async submitEntry(roundId, id, entry) {
       const state = read("state", null);

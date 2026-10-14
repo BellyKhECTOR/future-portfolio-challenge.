@@ -64,6 +64,11 @@
   .result-hero .rank { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: var(--card-2); font-weight: 700; }
   .lesson { background: var(--card); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px; margin: 18px 0; color: var(--muted); }
   .err { color: var(--red); font-size: 14px; margin-top: 8px; min-height: 18px; }
+  .note { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .stat-row div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: center; }
+  .stat-row b { display: block; font-family: var(--display); font-size: 20px; }
+  .stat-row span { font-size: 12px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -77,21 +82,21 @@
   <section id="sWait" class="screen centre">
     <div class="pulse"></div>
     <h1>Eyes on the big screen</h1>
-    <p class="muted">The portfolio builder opens as soon as the video ends.</p>
+    <p class="muted" id="waitMsg">The portfolio builder opens as soon as the video ends.</p>
   </section>
 
   <section id="sBuild" class="screen hidden">
     <div class="scenario">
-      <div class="kicker">Your scenario</div>
+      <div class="kicker" id="scKick">Your scenario</div>
       <h1 id="scTitle"></h1>
       <p id="scTag"></p>
     </div>
-    <p class="muted" style="margin:0">You manage <strong style="color:var(--text)">R10 million</strong>. Split it across the asset classes below so it adds up to exactly 100%. The best-performing portfolio wins.</p>
+    <p class="muted" style="margin:0" id="buildIntro"></p>
 
     <label class="name" for="nameIn">Your name or team name</label>
     <input id="nameIn" class="name-input" maxlength="20" autocomplete="off" placeholder="e.g. Thandi M">
 
-    <div class="capital"><span class="muted">Starting capital</span><strong>R10 000 000</strong></div>
+    <div class="capital"><span class="muted" id="capLabel">Your wealth to invest</span><strong id="capValue">R10 000 000</strong></div>
     <div id="assetList"></div>
   </section>
 
@@ -99,7 +104,7 @@
     <div class="done-card">
       <div class="tick">&#10003;</div>
       <h1>Portfolio locked in</h1>
-      <p class="muted">Watch the big screen for the results. You can still change your mind until the presenter closes submissions.</p>
+      <p class="muted" id="doneMsg">Watch the big screen for the results. You can still change your mind until the presenter closes submissions.</p>
       <div id="doneSummary" class="summary"></div>
       <button id="editBtn" class="btn ghost" style="margin-top:16px">Change my portfolio</button>
     </div>
@@ -113,15 +118,20 @@
 
   <section id="sResult" class="screen hidden">
     <div class="scenario">
-      <div class="kicker">Results</div>
+      <div class="kicker" id="rsKick">Results</div>
       <h1 id="rsTitle"></h1>
     </div>
     <div class="result-hero">
-      <div class="muted">Your R10 million is now worth</div>
+      <div class="muted" id="rsLabel">Your portfolio is now worth</div>
       <div class="big" id="rsValue"></div>
       <div id="rsGain"></div>
       <div class="rank" id="rsRank"></div>
     </div>
+    <div class="stat-row">
+      <div><b id="rsTotal"></b><span>since 2026</span></div>
+      <div><b id="rsBefore"></b><span id="rsBeforeLbl">at the start of this chapter</span></div>
+    </div>
+    <p class="note" id="rsNote"></p>
     <div class="lesson" id="rsLesson"></div>
     <div class="summary" id="rsBreakdown"></div>
   </section>
@@ -139,17 +149,30 @@
 
 <script type="module">
 import { createBackend } from "./js/backend.js";
-import { ASSETS, STARTING_CAPITAL, portfolioValue, formatRand, formatPct } from "./js/scenarios.js";
+import { ASSETS, STARTING_CAPITAL, START_YEAR, computeStandings, formatRand, formatPct } from "./js/scenarios.js";
 
 const $ = (id) => document.getElementById(id);
 const screens = ["sWait", "sBuild", "sDone", "sClosed", "sResult"];
 const show = (id) => { screens.forEach((s) => $(s).classList.toggle("hidden", s !== id)); $("dock").classList.toggle("hidden", id !== "sBuild"); };
 
-let backend, uid, state = null, alloc = {}, editing = false, entries = [], unsubEntries = null, entriesRound = null;
+let backend, uid, state = null, alloc = {}, editing = false, prefilled = null;
+let entries = [], unsubEntries = null, entriesRound = null;
+const cache = {}; // roundId -> entries of finished chapters
+let me = null;    // my standing before the current chapter (null = new player)
 ASSETS.forEach((a) => (alloc[a.id] = 0));
 
-const savedName = localStorage.getItem("fpc:name");
-if (savedName) $("nameIn").value = savedName;
+try { const n = localStorage.getItem("fpc:name"); if (n) $("nameIn").value = n; } catch {}
+
+/* ---------- standings ---------- */
+const history = () => state?.history || [];
+async function refreshStandings() {
+  await Promise.all(history().filter((h) => !cache[h.roundId]).map(async (h) => { cache[h.roundId] = await backend.getEntries(h.roundId); }));
+}
+function standingsBefore() {
+  const hist = history().filter((h) => h.roundId !== state?.roundId);
+  return computeStandings(hist, cache);
+}
+function myWealth() { return me ? me.wealth : STARTING_CAPITAL; }
 
 /* ---------- build allocation rows ---------- */
 $("assetList").innerHTML = ASSETS.map((a) => `
@@ -168,15 +191,8 @@ $("assetList").innerHTML = ASSETS.map((a) => `
   </div>`).join("");
 
 const totalPct = () => ASSETS.reduce((s, a) => s + alloc[a.id], 0);
-
-function setAlloc(id, v) {
-  alloc[id] = Math.max(0, Math.min(100, Math.round(v)));
-  render();
-}
-
-$("assetList").addEventListener("input", (e) => {
-  if (e.target.type === "range") setAlloc(e.target.id.slice(2), +e.target.value);
-});
+function setAlloc(id, v) { alloc[id] = Math.max(0, Math.min(100, Math.round(v))); render(); }
+$("assetList").addEventListener("input", (e) => { if (e.target.type === "range") setAlloc(e.target.id.slice(2), +e.target.value); });
 $("assetList").addEventListener("click", (e) => {
   const b = e.target.closest(".step"); if (!b) return;
   const id = b.closest(".asset").dataset.id;
@@ -185,11 +201,11 @@ $("assetList").addEventListener("click", (e) => {
 $("nameIn").addEventListener("input", render);
 
 function render() {
-  const t = totalPct();
+  const t = totalPct(), w = myWealth();
   ASSETS.forEach((a) => {
     $("p_" + a.id).textContent = alloc[a.id] + "%";
     $("r_" + a.id).value = alloc[a.id];
-    $("m_" + a.id).textContent = formatRand(STARTING_CAPITAL * alloc[a.id] / 100);
+    $("m_" + a.id).textContent = formatRand(w * alloc[a.id] / 100);
   });
   $("meter").innerHTML = ASSETS.map((a) => `<span style="width:${Math.min(alloc[a.id], 100)}%;background:${a.colour}"></span>`).join("");
   const el = $("total");
@@ -206,8 +222,7 @@ $("submitBtn").addEventListener("click", async () => {
   $("submitBtn").disabled = true; $("submitBtn").textContent = "Sending...";
   try {
     await backend.submitEntry(state.roundId, uid, { name, alloc: { ...alloc } });
-    localStorage.setItem("fpc:name", name);
-    localStorage.setItem("fpc:sub:" + state.roundId + ":" + uid, JSON.stringify(alloc));
+    try { localStorage.setItem("fpc:name", name); localStorage.setItem("fpc:sub:" + state.roundId + ":" + uid, JSON.stringify(alloc)); } catch {}
     editing = false;
     route();
   } catch (e) {
@@ -227,7 +242,7 @@ function mySubmission() {
 }
 
 function summaryHtml(a, returns) {
-  return ASSETS.filter((x) => a[x.id] > 0).map((x) => {
+  return ASSETS.filter((x) => a?.[x.id] > 0).map((x) => {
     const r = returns ? `<span class="${returns[x.id] >= 0 ? "pos" : "neg"}" style="font-size:13px;margin-left:8px">${formatPct(returns[x.id])}</span>` : "";
     return `<div class="r"><span class="dot" style="background:${x.colour}"></span>${x.name}${r}<span class="v">${a[x.id]}%</span></div>`;
   }).join("");
@@ -236,33 +251,61 @@ function summaryHtml(a, returns) {
 /* ---------- routing on game state ---------- */
 function route() {
   const s = state;
-  if (!s || !s.roundId || s.phase === "video" || s.phase === "idle") return show("sWait");
+  if (!s || !s.roundId || s.phase === "idle") {
+    $("waitMsg").textContent = history().length ? "The next chapter starts soon. Your wealth is waiting for you." : "The portfolio builder opens as soon as the video ends.";
+    return show("sWait");
+  }
+  if (s.phase === "video") { $("waitMsg").textContent = `Travelling to ${s.year}... the portfolio builder opens when the video ends.`; return show("sWait"); }
   const sub = mySubmission();
 
   if (s.phase === "open") {
-    $("scTitle").textContent = s.title || "";
+    $("scKick").textContent = `Chapter ${s.chapter} of ${s.chapters} - ${s.fromYear} to ${s.year} (${s.years} years)`;
+    $("scTitle").textContent = `${s.year}: ${s.title || ""}`;
     $("scTag").textContent = s.tagline || "";
-    if (sub && !editing) { $("doneSummary").innerHTML = summaryHtml(sub); return show("sDone"); }
-    if (sub && editing) { Object.assign(alloc, sub); }
+    $("buildIntro").innerHTML = me
+      ? `It's ${s.fromYear}. Your portfolio is worth <strong style="color:var(--text)">${formatRand(me.wealth)}</strong>. Rebalance it for the next ${s.years} years - if you don't submit, your current mix carries on.`
+      : `It's ${s.fromYear}. You have <strong style="color:var(--text)">R10 million</strong> to invest for the next ${s.years} years. Split it so it adds up to exactly 100%. The richest portfolio at the end wins.`;
+    $("capLabel").textContent = `Your wealth in ${s.fromYear}`;
+    $("capValue").textContent = formatRand(myWealth());
+    if (sub && !editing) {
+      $("doneSummary").innerHTML = summaryHtml(sub);
+      $("doneMsg").textContent = `${formatRand(myWealth())} invested until ${s.year}. You can change your mind until the presenter closes submissions.`;
+      return show("sDone");
+    }
+    if (sub && editing) Object.assign(alloc, sub);
+    else if (prefilled !== s.roundId && me) { Object.assign(alloc, me.alloc); prefilled = s.roundId; }
     render();
     return show("sBuild");
   }
   if (s.phase === "closed") {
-    $("closedMsg").textContent = sub ? "The results are about to be revealed." : "You didn't submit a portfolio this round. Join in on the next one!";
+    $("closedMsg").textContent = sub ? "The results are about to be revealed." : me ? "You didn't rebalance, so your previous portfolio carries on into this chapter." : "You didn't submit a portfolio this time. Join in on the next chapter!";
     return show("sClosed");
   }
   if (s.phase === "results") {
-    if (!sub) { $("closedMsg").textContent = "Results are on the big screen. Join in on the next round!"; return show("sClosed"); }
-    const v = portfolioValue(sub, s.returns);
-    const gain = (v / STARTING_CAPITAL - 1) * 100;
-    $("rsTitle").textContent = s.title || "";
-    $("rsValue").textContent = formatRand(v);
-    $("rsGain").innerHTML = `<span class="${gain >= 0 ? "pos" : "neg"}" style="font-weight:700">${formatPct(gain)} (${gain >= 0 ? "+" : ""}${formatRand(v - STARTING_CAPITAL)})</span>`;
+    const hist = history();
+    const all = computeStandings(hist, cache);
+    const idx = all.findIndex((p) => p.uid === uid);
+    if (idx < 0) { $("closedMsg").textContent = "Results are on the big screen. Join in on the next chapter!"; return show("sClosed"); }
+    const p = all[idx];
+    const prevAll = computeStandings(hist.slice(0, -1), cache);
+    const prevIdx = prevAll.findIndex((x) => x.uid === uid);
+    const chg = (p.wealth / p.before - 1) * 100;
+    const total = (p.wealth / STARTING_CAPITAL - 1) * 100;
+    $("rsKick").textContent = `Chapter ${hist.length} results`;
+    $("rsTitle").textContent = `${s.year}: ${s.title || ""}`;
+    $("rsLabel").textContent = `In ${s.year} your portfolio is worth`;
+    $("rsValue").textContent = formatRand(p.wealth);
+    $("rsGain").innerHTML = `<span class="${chg >= 0 ? "pos" : "neg"}" style="font-weight:700">${formatPct(chg)} this chapter (${chg >= 0 ? "+" : ""}${formatRand(p.wealth - p.before)})</span>`;
+    let move = "";
+    if (prevIdx >= 0 && prevIdx !== idx) move = prevIdx > idx ? ` - up ${prevIdx - idx}` : ` - down ${idx - prevIdx}`;
+    $("rsRank").textContent = `You're ${idx + 1} of ${all.length}${move}`;
+    $("rsTotal").textContent = formatPct(total);
+    $("rsTotal").className = total >= 0 ? "pos" : "neg";
+    $("rsBefore").textContent = formatRand(p.before);
+    $("rsBeforeLbl").textContent = `in ${s.fromYear}`;
+    $("rsNote").textContent = p.rebalanced ? "" : "You didn't rebalance this chapter, so your previous mix was used.";
     $("rsLesson").textContent = s.lesson || "";
-    $("rsBreakdown").innerHTML = summaryHtml(sub, s.returns);
-    const ranked = entries.map((e) => portfolioValue(e.alloc, s.returns)).sort((a, b) => b - a);
-    const pos = ranked.findIndex((x) => x <= v + 0.5) + 1;
-    $("rsRank").textContent = ranked.length ? `You placed ${pos || ranked.length} of ${ranked.length}` : "";
+    $("rsBreakdown").innerHTML = summaryHtml(p.alloc, s.returns);
     return show("sResult");
   }
   show("sWait");
@@ -270,8 +313,8 @@ function route() {
 
 function watchRoundEntries() {
   if (!state?.roundId || state.roundId === entriesRound) return;
-  unsubEntries?.(); entriesRound = state.roundId;
-  unsubEntries = backend.watchEntries(state.roundId, (list) => { entries = list; if (state?.phase === "results" || (state?.phase === "open" && !editing)) route(); });
+  unsubEntries?.(); entriesRound = state.roundId; entries = [];
+  unsubEntries = backend.watchEntries(state.roundId, (list) => { entries = list; if (state?.phase === "open" && !editing) route(); });
 }
 
 (async () => {
@@ -279,18 +322,24 @@ function watchRoundEntries() {
   $("modeBadge").textContent = backend.mode === "live" ? "Live" : "Demo";
   $("modeBadge").classList.add(backend.mode);
   uid = await backend.signInLearner();
-  backend.watchState((s) => {
+  let seq = 0;
+  backend.watchState(async (s) => {
+    const my = ++seq;
     const newRound = s?.roundId !== state?.roundId;
+    if (s?.gameId !== state?.gameId) { for (const k in cache) delete cache[k]; }
     state = s;
-    if (newRound) { editing = false; entries = []; ASSETS.forEach((a) => (alloc[a.id] = 0)); }
+    if (newRound) { editing = false; ASSETS.forEach((a) => (alloc[a.id] = 0)); }
     watchRoundEntries();
+    try { await refreshStandings(); } catch (e) { console.error(e); }
+    if (my !== seq) return;
+    me = standingsBefore().find((p) => p.uid === uid) || null;
     route();
   });
 })().catch((e) => {
   console.error(e);
   $("modeBadge").textContent = "Offline";
   document.querySelector("#sWait h1").textContent = "Can't connect right now";
-  document.querySelector("#sWait p").textContent = "Check your data or Wi-Fi and refresh this page.";
+  $("waitMsg").textContent = "Check your data or Wi-Fi and refresh this page.";
 });
 </script>
 </body>
