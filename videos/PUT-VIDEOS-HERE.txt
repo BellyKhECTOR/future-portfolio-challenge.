@@ -1,9 +1,9 @@
-Put your scenario videos in this folder with these names (or change the names in Settings / js/scenarios.js):
+The four chapter videos live in this folder and play automatically on the presenter screen:
 
-  ai-boom.mp4
-  green-shift.mp4
-  global-shock.mp4
-  sa-rising.mp4
+  ai-boom.mp4       Chapter 1 - 2031 The AI Boom
+  green-shift.mp4   Chapter 2 - 2046 The Green Shift
+  global-shock.mp4  Chapter 3 - 2050 The Great Slowdown
+  sa-rising.mp4     Chapter 4 - 2055 SA Rising
 
-MP4 (H.264) plays in every browser. Keep each file under ~200 MB so the site deploys quickly.
-You can also skip this folder and pick a video from your laptop on the night ("Choose video from computer").
+To use your own video instead, replace the file with one of the same name (MP4, under ~90 MB),
+or pick a file from your laptop on the day with "Other video".
