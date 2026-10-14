@@ -59,6 +59,7 @@ input { font: inherit; }
   border-bottom: 4px solid var(--deep-red);
 }
 .brandbar img.mazi { height: 40px; width: auto; display: block; }
+.brandbar img.anniv { height: 46px; width: auto; display: block; }
 .brandbar .divider { width: 1px; align-self: stretch; background: var(--graphite-grey-lightest); margin: 4px 4px; }
 .brandbar .title { font-family: var(--condensed); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--charcoal-navy); }
 .brandbar .badge { background: var(--light-grey); color: var(--graphite-grey); border-color: var(--graphite-grey-lightest); }
