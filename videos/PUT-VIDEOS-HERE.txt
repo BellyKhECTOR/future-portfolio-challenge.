@@ -1,5 +1,6 @@
 The four chapter videos live in this folder and play automatically on the presenter screen:
 
+  investing-101.mp4 Investing 101 lesson (played from the timeline before chapter 1)
   ai-boom.mp4       Chapter 1 - 2031 The AI Boom
   green-shift.mp4   Chapter 2 - 2046 The Green Shift
   global-shock.mp4  Chapter 3 - 2050 The Great Slowdown

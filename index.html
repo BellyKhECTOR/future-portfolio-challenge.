@@ -194,11 +194,12 @@
   <!-- HOME / TIMELINE -->
   <section id="sHome" class="screen">
     <div class="hero">
-      <h1>The future is coming.<br><em>Grow R500 from 2026 to 2055.</em></h1>
-      <p>One journey, four chapters. Each video jumps forward in time. Learners rebalance on their phones, and whatever they have grown carries into the next chapter. The richest portfolio in 2055 wins.</p>
+      <h1>The future is coming.<br><em>Grow R1000 from 2026 to 2055.</em></h1>
+      <p>Start with <strong>Investing 101</strong> so everyone knows what shares, bonds and property are. Then: one journey, four chapters. Each video jumps forward in time. Learners rebalance on their phones, and whatever they have grown carries into the next chapter. The richest portfolio in 2055 wins.</p>
     </div>
     <div class="tl" id="timeline"></div>
     <div class="row" style="margin-top:28px">
+      <button class="btn" id="lessonBtn">Step 1: Watch Investing 101</button>
       <button class="btn" id="nextChapterBtn">Start 2031</button>
       <button class="btn ghost hidden" id="standingsBtn">View standings</button>
       <button class="btn ghost" id="newGameBtn">New game</button>
@@ -394,21 +395,23 @@ function renderHome() {
   const nxt = nextChapter();
   const list = chapters();
   $("timeline").innerHTML = `
-    <div class="node start"><div class="span">Today</div><div class="yr">${START_YEAR}</div><h3>The start</h3><p>Every learner gets R500 to invest.</p><div class="st">R500 each</div></div>` +
+    <div class="node start"><div class="span">Today</div><div class="yr">${START_YEAR}</div><h3>The start</h3><p>Every learner gets R1000 to invest.</p><div class="st">R1000 each</div></div>` +
     list.map((c, i) => {
       const cls = done.has(c.id) ? "done" : c.id === nxt?.id ? "next" : "locked";
       const st = done.has(c.id) ? "Played" : c.id === nxt?.id ? "Up next" : "Locked";
       return `<div class="node ${cls}"><div class="span">Chapter ${i + 1} - ${c.years} years later</div><div class="yr">${c.year}</div><h3>${esc(c.title)}</h3><p>${esc(c.tagline)}</p><div class="st">${st}</div></div>`;
     }).join("");
   $("nextChapterBtn").classList.toggle("hidden", !nxt);
-  if (nxt) $("nextChapterBtn").textContent = history().length ? `Continue to ${nxt.year}` : `Start the journey: ${nxt.year}`;
+  if (nxt) $("nextChapterBtn").textContent = history().length ? `Continue to ${nxt.year}` : `Step 2: Start the journey - ${nxt.year}`;
+  $("lessonBtn").textContent = history().length ? "Replay Investing 101" : "Step 1: Watch Investing 101";
+  $("lessonBtn").classList.toggle("ghost", history().length > 0);
   $("standingsBtn").classList.toggle("hidden", !history().length);
   $("standingsBtn").textContent = nxt ? "View standings" : "Final standings";
 }
 $("nextChapterBtn").addEventListener("click", () => { const c = nextChapter(); if (c) startRound(c); });
 $("standingsBtn").addEventListener("click", async () => { await ensureHistory(); renderResults(true); });
 $("newGameBtn").addEventListener("click", async () => {
-  if (history().length && !confirm("Start a new game? Everyone goes back to R500 in 2026.")) return;
+  if (history().length && !confirm("Start a new game? Everyone goes back to R1000 in 2026.")) return;
   if (await writeState({ gameId: newId("g"), history: [], phase: "idle", roundId: null, scenarioId: null, returns: null, lesson: null })) { entries = []; renderHome(); showScreen("sHome"); }
 });
 
@@ -423,7 +426,25 @@ async function startRound(c) {
   if (ok) playVideo(c);
 }
 
+let videoMode = "round";
+const LESSON_VIDEO = "videos/investing-101.mp4";
+function playLesson() {
+  videoMode = "lesson";
+  const v = $("video");
+  $("videoWrap").classList.remove("hidden"); $("videoMissing").classList.add("hidden"); $("videoCtrl").classList.remove("hidden");
+  $("vSkip").textContent = "Back to timeline"; $("vmSkip").textContent = "Back to timeline";
+  v.src = localVideos.__lesson || LESSON_VIDEO;
+  v.onerror = () => { $("vmTitle").textContent = "Investing 101"; $("vmPath").textContent = `Couldn't load "${LESSON_VIDEO}". Choose the file, or go back to the timeline.`; $("videoMissing").classList.remove("hidden"); $("videoCtrl").classList.add("hidden"); };
+  v.onended = endLesson;
+  v.play().catch(() => {});
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+}
+function endLesson() { closeVideo(); videoMode = "round"; renderHome(); showScreen("sHome"); }
+$("lessonBtn").addEventListener("click", playLesson);
+
 function playVideo(c) {
+  videoMode = "round";
+  $("vSkip").textContent = "Skip to QR code"; $("vmSkip").textContent = "Skip to portfolio builder";
   const v = $("video");
   $("videoWrap").classList.remove("hidden");
   $("videoMissing").classList.add("hidden");
@@ -440,14 +461,15 @@ function playVideo(c) {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
 }
 function useLocalFile(file) {
+  if (file && videoMode === "lesson") { localVideos.__lesson = URL.createObjectURL(file); return playLesson(); }
   if (!file || !state) return;
   localVideos[state.scenarioId] = URL.createObjectURL(file);
   playVideo(chapterById(state.scenarioId) || { id: state.scenarioId, title: state.title, year: state.year });
 }
 $("vmFile").addEventListener("change", (e) => useLocalFile(e.target.files[0]));
 $("vFile").addEventListener("change", (e) => useLocalFile(e.target.files[0]));
-$("vmSkip").addEventListener("click", () => openSubmissions());
-$("vSkip").addEventListener("click", () => openSubmissions());
+$("vmSkip").addEventListener("click", () => videoMode === "lesson" ? endLesson() : openSubmissions());
+$("vSkip").addEventListener("click", () => videoMode === "lesson" ? endLesson() : openSubmissions());
 function closeVideo() { const v = $("video"); v.pause(); v.onerror = null; v.removeAttribute("src"); v.load(); $("videoWrap").classList.add("hidden"); }
 
 async function openSubmissions() {
@@ -464,7 +486,7 @@ function renderOpen() {
   $("openKick").textContent = `Chapter ${state?.chapter || ""} of ${state?.chapters || ""} - ${state?.fromYear} to ${state?.year} (${state?.years} years)`;
   $("openTitle").textContent = `${state?.year}: ${state?.title || ""}`;
   $("openTag").textContent = state?.tagline || "";
-  $("stepTwo").textContent = history().length ? "Rebalance your wealth - it carries into this chapter" : "Split your R500 across the asset classes";
+  $("stepTwo").textContent = history().length ? "Rebalance your wealth - it carries into this chapter" : "Split your R1000 across the asset classes";
   const url = playUrl();
   $("playUrl").textContent = url.replace(/^https?:\/\//, "");
   $("qr").innerHTML = "";
@@ -759,7 +781,7 @@ function readSettings() {
 }
 $("settingsBtn").addEventListener("click", () => { renderSettings(); $("settings").showModal(); });
 $("resetGameBtn").addEventListener("click", async () => {
-  if (!confirm("Reset the game from scratch?\n\nThis permanently deletes every learner's portfolios and all results, and takes the timeline back to 2026 with everyone on R500.")) return;
+  if (!confirm("Reset the game from scratch?\n\nThis permanently deletes every learner's portfolios and all results, and takes the timeline back to 2026 with everyone on R1000.")) return;
   const btn = $("resetGameBtn"); btn.disabled = true; btn.textContent = "Resetting...";
   try {
     finaleRun++; $("finale").classList.add("hidden"); closeVideo(); clearInterval(timerInt); timerEnd = null;

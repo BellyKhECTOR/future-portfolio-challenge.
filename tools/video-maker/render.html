@@ -17,6 +17,7 @@
   .ticker .lbl { background: var(--sand); color: var(--navy); font-family: Oswald; font-weight: 600; letter-spacing: .12em; font-size: 28px; height: 100%; display: flex; align-items: center; padding: 0 30px; z-index: 2; flex: none; }
   .ticker .run { white-space: nowrap; font-size: 28px; font-weight: 500; padding-left: 40px; will-change: transform; }
   .cap { position: absolute; left: 160px; right: 160px; bottom: 104px; text-align: center; font-size: 34px; line-height: 1.35; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  .cap.small { font-size: 30px; }
   .cap span { background: rgba(29,38,51,.72); padding: 6px 16px; border-radius: 10px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
   /* travel */
   .travel { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-bottom: 120px; }
@@ -32,6 +33,20 @@
   .news .iconbox { width: 560px; height: 560px; border-radius: 40px; background: rgba(57,64,76,.55); border: 2px solid var(--navy3); display: grid; place-items: center; }
   .news svg { width: 440px; height: 440px; overflow: visible; }
   .draw { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  /* title */
+  .title { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-bottom: 120px; }
+  .title .big { font-family: Oswald; font-weight: 700; font-size: 230px; line-height: 1; letter-spacing: .02em; }
+  .title .big span { color: var(--sand); }
+  .title .tag { font-size: 54px; color: var(--mist); margin-top: 24px; }
+  /* learn */
+  .learn { display: grid; grid-template-columns: 1fr 520px; align-items: center; gap: 60px; padding: 150px 120px 300px; }
+  .learn .kick { display: inline-block; background: var(--red); color: #fff; font-family: Oswald; letter-spacing: .16em; font-size: 28px; padding: 8px 22px; border-radius: 8px; text-transform: uppercase; }
+  .learn .head { font-size: 76px; font-weight: 600; line-height: 1.06; margin: 24px 0 18px; }
+  .learn .sub2 { font-size: 38px; color: var(--mist); line-height: 1.3; }
+  .learn .ex { margin-top: 30px; background: rgba(253,205,162,.1); border-left: 8px solid var(--sand); border-radius: 14px; padding: 22px 28px; font-size: 36px; line-height: 1.32; }
+  .learn .ex b { display: block; font-family: Oswald; font-weight: 500; letter-spacing: .14em; color: var(--sand); font-size: 24px; margin-bottom: 6px; }
+  .learn .iconbox { width: 520px; height: 520px; border-radius: 40px; background: rgba(57,64,76,.55); border: 2px solid var(--navy3); display: grid; place-items: center; }
+  .learn svg { width: 410px; height: 410px; overflow: visible; }
   /* close */
   .close { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 200px 220px; }
   .close .its { font-family: Oswald; letter-spacing: .2em; color: var(--sand); font-size: 40px; }
@@ -72,7 +87,7 @@ const ICONS = {
     <path class="draw" d="M20 190 H180" stroke="var(--gold)" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>`,
   gem: (p, t) => `<path class="draw" d="M50 70 L75 40 H125 L150 70 L100 160 Z M50 70 H150 M75 40 L90 70 L100 160 L110 70 L125 40" stroke="var(--sand)" stroke-width="6" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
     <path d="M50 70 L75 40 H125 L150 70 L100 160 Z" fill="var(--gold)" opacity="${clamp(p * 2 - 1) * .35}"/>
-    ${[[40, 40], [160, 50], [150, 150]].map(([x, y], i) => `<path d="M${x} ${y - 12} V${y + 12} M${x - 12} ${y} H${x + 12}" stroke="var(--sand)" stroke-width="4" stroke-linecap="round" opacity="${(Math.sin(t * 4 + i * 2) * .5 + .5) * clamp(p * 2 - 1)}"/>`).join("")}`,
+    ${[[40, 40], [160, 50], [150, 150]].map(([x, y], i) => `<path d="M${x} ${y - 12} V${y + 12} M${x - 12} ${y} H${x + 12}" fill="none" stroke="var(--sand)" stroke-width="4" stroke-linecap="round" opacity="${(Math.sin(t * 4 + i * 2) * .5 + .5) * clamp(p * 2 - 1)}"/>`).join("")}`,
   curve: (p, t) => `<path class="draw" d="M30 30 V170 H180" stroke="var(--mist)" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - clamp(p * 2)}"/>
     <path class="draw" d="M30 165 C90 160, 130 140, 175 35" stroke="var(--sand)" stroke-width="8" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - clamp(p * 1.5 - .3)}"/>
     <path class="draw" d="M30 165 C90 162, 130 155, 175 130" stroke="var(--red2)" stroke-width="6" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - clamp(p * 1.5 - .3)}"/>`,
@@ -94,13 +109,41 @@ const ICONS = {
   globe: (p, t) => `<circle class="draw" cx="100" cy="100" r="70" stroke="var(--sand)" stroke-width="6" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
     ${[20, 45].map((rx) => `<ellipse cx="100" cy="100" rx="${rx * Math.abs(Math.cos(t * .8)) + 4}" ry="70" fill="none" stroke="var(--gold)" stroke-width="4" opacity="${clamp(p * 2 - .5)}"/>`).join("")}
     <path d="M30 100 H170 M42 65 H158 M42 135 H158" stroke="var(--gold)" stroke-width="4" opacity="${clamp(p * 2 - .5)}"/>`,
+  piggy: (p, t) => `<ellipse class="draw" cx="95" cy="110" rx="65" ry="48" stroke="var(--sand)" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
+    <path class="draw" d="M55 150 V172 M120 150 V172 M160 104 C172 100, 176 110, 168 116" stroke="var(--sand)" stroke-width="7" opacity="${clamp(p * 2 - .5)}"/>
+    <path d="M70 66 L62 44 L88 60 Z" fill="var(--sand)" opacity="${clamp(p * 2 - .5)}"/><circle cx="120" cy="98" r="5" fill="var(--sand)" opacity="${clamp(p * 2 - .5)}"/>
+    <rect x="80" y="${52 - 8 * clamp(p * 2 - 1)}" width="30" height="7" rx="3" fill="var(--navy)" stroke="var(--sand)" stroke-width="4" opacity="${clamp(p * 2 - .6)}"/>
+    <g transform="translate(0 ${-40 + 90 * ((t * .6) % 1)})" opacity="${clamp(p * 2 - 1) * (1 - (t * .6) % 1)}"><circle cx="95" cy="0" r="14" fill="var(--gold)"/><text x="95" y="7" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="18" fill="var(--navy)">R</text></g>`,
+  cart: (p, t) => `<path class="draw" d="M20 40 H48 L70 135 H160 L178 70 H58" stroke="var(--sand)" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
+    <circle cx="82" cy="160" r="12" fill="var(--gold)" opacity="${clamp(p * 2 - .4)}"/><circle cx="148" cy="160" r="12" fill="var(--gold)" opacity="${clamp(p * 2 - .4)}"/>
+    ${[[80, 0], [108, 1], [136, 2]].map(([x, i]) => `<rect x="${x}" y="${120 - 40 * out(p * 1.6 - .4 - i * .15)}" width="22" height="${40 * out(p * 1.6 - .4 - i * .15)}" rx="3" fill="${["var(--red2)", "var(--rose)", "var(--sand)"][i]}"/>`).join("")}`,
+  iou: (p, t) => `<rect class="draw" x="40" y="30" width="120" height="150" rx="12" stroke="var(--sand)" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
+    <path d="M62 62 H138 M62 86 H120 M62 110 H130" stroke="var(--mist)" stroke-width="6" stroke-linecap="round" opacity="${clamp(p * 2 - .5)}"/>
+    <circle cx="140" cy="150" r="30" fill="var(--gold)" opacity="${clamp(p * 2 - 1)}"/><text x="140" y="160" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="28" fill="var(--navy)" opacity="${clamp(p * 2 - 1)}">+%</text>`,
+  building: (p, t) => `<path class="draw" d="M35 180 V70 L100 30 L165 70 V180 Z" stroke="var(--sand)" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
+    ${[0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => `<rect x="${55 + c * 32}" y="${82 + r * 28}" width="20" height="16" rx="2" fill="${(r + c + Math.floor(t * 2)) % 3 === 0 ? "var(--sand)" : "var(--navy3)"}" opacity="${clamp(p * 2 - .6)}"/>`)).join("")}
+    <rect x="86" y="150" width="28" height="30" fill="var(--gold)" opacity="${clamp(p * 2 - .8)}"/>`,
+  bank: (p, t) => `<path class="draw" d="M25 70 L100 28 L175 70 Z M35 175 H165 M45 160 H155" stroke="var(--sand)" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
+    ${[55, 85, 115, 145].map((x, i) => `<rect x="${x - 6}" y="80" width="12" height="${75 * out(p * 1.6 - .3 - i * .1)}" rx="3" fill="var(--mist)"/>`).join("")}`,
+  worldiou: (p, t) => `<circle class="draw" cx="80" cy="95" r="55" stroke="var(--sand)" stroke-width="6" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
+    <ellipse cx="80" cy="95" rx="${22 * Math.abs(Math.cos(t * .8)) + 3}" ry="55" fill="none" stroke="var(--gold)" stroke-width="4" opacity="${clamp(p * 2 - .5)}"/><path d="M25 95 H135" stroke="var(--gold)" stroke-width="4" opacity="${clamp(p * 2 - .5)}"/>
+    <rect x="110" y="100" width="70" height="85" rx="8" fill="var(--navy2)" stroke="var(--rose)" stroke-width="6" opacity="${clamp(p * 2 - .8)}"/><path d="M124 125 H166 M124 145 H158 M124 165 H162" stroke="var(--rose)" stroke-width="5" stroke-linecap="round" opacity="${clamp(p * 2 - .8)}"/>`,
+  bars: (p, t) => [[30, 140, 0], [100, 140, 1], [65, 95, 2]].map(([x, y, i]) => { const d = 30 * (1 - out(p * 1.5 - i * .25)); return `<path d="M${x} ${y - d + 40} L${x + 15} ${y - d} H${x + 60} L${x + 75} ${y - d + 40} Z" fill="${["var(--gold)", "var(--sand)", "var(--gold)"][i]}" stroke="var(--navy)" stroke-width="3" opacity="${clamp(p * 2.5 - i * .4)}"/>`; }).join("")
+    + [[40, 50], [160, 60], [100, 30]].map(([x, y], i) => `<path d="M${x} ${y - 10} V${y + 10} M${x - 10} ${y} H${x + 10}" fill="none" stroke="var(--sand)" stroke-width="4" stroke-linecap="round" opacity="${(Math.sin(t * 4 + i * 2) * .5 + .5) * clamp(p * 2 - 1)}"/>`).join(""),
+  scales: (p, t) => { const a = Math.sin(t * 1.4) * 8 * clamp(p * 2 - .5); return `<path class="draw" d="M100 30 V170 M65 175 H135" stroke="var(--mist)" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - clamp(p * 2)}"/>
+    <g transform="rotate(${a} 100 50)" opacity="${clamp(p * 2 - .4)}"><path d="M30 50 H170" stroke="var(--sand)" stroke-width="7" stroke-linecap="round"/>
+      <path d="M30 50 L12 100 H48 Z" fill="none" stroke="var(--sand)" stroke-width="4"/><path d="M170 50 L152 100 H188 Z" fill="none" stroke="var(--sand)" stroke-width="4"/>
+      <text x="30" y="128" text-anchor="middle" font-family="Oswald" font-size="22" fill="var(--rose)">RISK</text><text x="170" y="128" text-anchor="middle" font-family="Oswald" font-size="22" fill="var(--gold)">RETURN</text></g>`; },
+  phone: (p, t) => `<rect class="draw" x="55" y="15" width="90" height="170" rx="16" stroke="var(--sand)" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1 - p}"/>
+    <g transform="translate(62 55) scale(1.02)" style="color:var(--sand)" opacity="${clamp(p * 2 - .6)}">${ICONS.qr()}</g>
+    <path d="M88 165 H112" stroke="var(--sand)" stroke-width="6" stroke-linecap="round" opacity="${clamp(p * 2 - .6)}"/>`,
   qr: () => { let s = ""; const pat = [[0, 0], [5, 0], [0, 5]]; pat.forEach(([x, y]) => { s += `<rect x="${x * 10 + 5}" y="${y * 10 + 5}" width="25" height="25" fill="none" stroke="currentColor" stroke-width="5"/><rect x="${x * 10 + 13}" y="${y * 10 + 13}" width="9" height="9" fill="currentColor"/>`; });
     [[6, 6], [7, 4], [4, 7], [7, 7], [5, 5]].forEach(([x, y]) => s += `<rect x="${x * 10}" y="${y * 10}" width="8" height="8" fill="currentColor"/>`); return s; },
 };
 
 function setup(cfg) {
   CFG = cfg;
-  document.getElementById("chapK").textContent = `CHAPTER ${cfg.n} OF 4`;
+  document.getElementById("chapK").textContent = cfg.n ? `CHAPTER ${cfg.n} OF 4` : "INVESTING 101";
   document.getElementById("run").textContent = cfg.ticker;
 }
 
@@ -108,7 +151,9 @@ function buildScene(i) {
   const s = CFG.scenes[i], el = document.getElementById("scene");
   if (s.type === "travel") el.innerHTML = `<div class="layer travel"><div class="sub" id="tSub">CHAPTER ${CFG.n} - ${CFG.year - CFG.from} YEARS LATER</div><div class="num" id="tNum"></div><div class="ttl" id="tTtl">${CFG.title}</div></div>`;
   if (s.type === "news") el.innerHTML = `<div class="layer news"><div><div id="nk"><span class="kick">${s.kicker}</span><span class="dt">${CFG.year}</span></div><div class="head" id="nh">${s.head}</div><div class="sub2" id="ns">${s.sub}</div></div><div class="iconbox" id="ib"><svg viewBox="0 0 200 200" id="ic"></svg></div></div>`;
-  if (s.type === "close") el.innerHTML = `<div class="layer close"><div class="its" id="ci">IT'S ${CFG.from}. YOU'VE SEEN THE FUTURE.</div><div class="q" id="cq">${CFG.question}</div><div class="scan" id="cs"><svg viewBox="0 0 75 75" style="color:var(--navy)">${ICONS.qr()}</svg>Scan the QR code</div></div>`;
+  if (s.type === "title") el.innerHTML = `<div class="layer title"><div class="big" id="ttB">INVESTING <span>101</span></div><div class="tag" id="ttT">How money grows - before we travel to the future</div></div>`;
+  if (s.type === "learn") el.innerHTML = `<div class="layer learn"><div><div id="nk"><span class="kick">${s.kicker}</span></div><div class="head" id="nh">${s.head}</div><div class="sub2" id="ns">${s.sub}</div><div class="ex" id="nx"><b>${s.exLabel || "EVERYDAY EXAMPLE"}</b>${s.ex}</div></div><div class="iconbox" id="ib"><svg viewBox="0 0 200 200" id="ic"></svg></div></div>`;
+  if (s.type === "close") el.innerHTML = `<div class="layer close"><div class="its" id="ci">${CFG.closeKick || `IT'S ${CFG.from}. YOU'VE SEEN THE FUTURE.`}</div><div class="q" id="cq">${CFG.question}</div><div class="scan" id="cs"><svg viewBox="0 0 75 75" style="color:var(--navy)">${ICONS.qr()}</svg>Scan the QR code</div></div>`;
 }
 
 function drawBg(t, s, lt) {
@@ -146,7 +191,7 @@ function frame(t) {
   const shownYear = s.type === "travel" ? Math.round(CFG.from + (CFG.year - CFG.from) * ease((lt - 0.6) / 3.2)) : (s.type === "close" ? CFG.from : CFG.year);
   document.getElementById("chapY").textContent = shownYear;
   // captions
-  document.getElementById("cap").innerHTML = `<span>${s.say}</span>`;
+  document.getElementById("cap").innerHTML = `<span>${s.say}</span>`; document.getElementById("cap").className = "cap" + (s.say.length > 230 ? " small" : "");
   document.getElementById("cap").style.opacity = clamp(lt / 0.3) * fadeOut;
   // ticker
   document.getElementById("run").style.transform = `translateX(${-(t * 140) % 2400}px)`;
@@ -156,6 +201,16 @@ function frame(t) {
     n.style.transform = `scale(${1 + 0.08 * Math.sin(p * Math.PI)})`; n.style.color = p >= 1 ? "var(--sand)" : "#fff";
     document.getElementById("tSub").style.opacity = clamp(lt / 0.6);
     const tt = document.getElementById("tTtl"); tt.style.opacity = clamp((lt - 3.9) / 0.6); tt.style.transform = `translateY(${30 * (1 - out((lt - 3.9) / 0.6))}px)`;
+  }
+  if (s.type === "title") {
+    const b = document.getElementById("ttB"); b.style.opacity = clamp(lt / 0.6); b.style.transform = `scale(${0.9 + 0.1 * out(lt / 0.9)})`;
+    const tg = document.getElementById("ttT"); tg.style.opacity = clamp((lt - 0.8) / 0.6);
+  }
+  if (s.type === "learn") {
+    const a = (id, d) => { const e = document.getElementById(id); e.style.opacity = clamp((lt - d) / 0.5); e.style.transform = `translateX(${-60 * (1 - out((lt - d) / 0.6))}px)`; };
+    a("nk", 0.1); a("nh", 0.35); a("ns", 0.9); a("nx", 2.2);
+    const ib = document.getElementById("ib"); ib.style.opacity = clamp((lt - 0.4) / 0.5); ib.style.transform = `scale(${0.9 + 0.1 * out((lt - 0.4) / 0.6)})`;
+    document.getElementById("ic").innerHTML = ICONS[s.icon](clamp((lt - 0.6) / 2.2), t);
   }
   if (s.type === "news") {
     const a = (id, d) => { const e = document.getElementById(id); e.style.opacity = clamp((lt - d) / 0.5); e.style.transform = `translateX(${-60 * (1 - out((lt - d) / 0.6))}px)`; };

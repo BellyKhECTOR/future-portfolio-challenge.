@@ -1,6 +1,6 @@
 # Future Portfolio Challenge - setup guide
 
-A live classroom game: a scenario video plays, a QR code appears, learners build a R500 portfolio on their phones (no login), and the top 10 appear on a leaderboard.
+A live classroom game: a scenario video plays, a QR code appears, learners build a R1000 portfolio on their phones (no login), and the top 10 appear on a leaderboard.
 
 ## What's in the folder
 
@@ -51,21 +51,22 @@ You can change years, titles, taglines, video names, lessons and returns in **Se
 
 ## Running a session
 
-The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 2055**. Every learner starts with R500, and whatever they grow carries into the next chapter. The richest portfolio in 2055 wins.
+The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 2055**. Every learner starts with R1000, and whatever they grow carries into the next chapter. The richest portfolio in 2055 wins.
 
 1. Open the site on the projector laptop in Edge, sign in with Google, press **Full screen**. Press **New game** to start fresh.
-2. Press **Start the journey: 2031**. The video plays full screen.
-3. When the video ends (or you press **Skip to QR code**), the QR appears and submissions open. Optionally start a timer.
-4. Learners scan, enter a name and split their wealth to exactly 100%. From chapter 2 onwards their phone shows what their portfolio is worth and pre-fills their last mix.
-5. Press **Close submissions**, then **Reveal results**. The chapter's returns appear and the top 10 by **total wealth** animate in, with arrows showing who moved up or down. Each phone shows that learner's wealth, change this chapter, total since 2026 and rank.
-6. Press **Continue to 2046** and repeat.
-7. After the 2055 chapter, **Reveal results** starts the **winners ceremony**: a 5-second countdown, then third place, the runner-up and the winner on a podium (with confetti and sound), then a chart of how the top three's wealth grew from 2026 to 2055 against the class average. Phones show "The winners are being revealed!" until the ceremony ends, then each learner's final result. Use **Full leaderboard** (or Esc) to see the top 10, and **Winners ceremony** on the results screen to replay it. Turn the laptop sound on for the countdown ticks and fanfare.
+2. Press **Step 1: Watch Investing 101** - a 4-minute narrated lesson that explains the 7 investments with everyday South African examples (shares in Shoprite and MTN, lending your cousin R100, rent from the mall, bread prices and inflation), plus risk, diversification, the rand and compounding. You can pause it to ask questions. Learners' phones show "Meet the 7 investments" while they wait, and every investment on the portfolio builder has a **What is this?** explanation.
+3. Press **Step 2: Start the journey - 2031**. The video plays full screen.
+4. When the video ends (or you press **Skip to QR code**), the QR appears and submissions open. Optionally start a timer.
+5. Learners scan, enter a name and split their wealth to exactly 100%. From chapter 2 onwards their phone shows what their portfolio is worth and pre-fills their last mix.
+6. Press **Close submissions**, then **Reveal results**. The chapter's returns appear and the top 10 by **total wealth** animate in, with arrows showing who moved up or down. Each phone shows that learner's wealth, change this chapter, total since 2026 and rank.
+7. Press **Continue to 2046** and repeat.
+8. After the 2055 chapter, **Reveal results** starts the **winners ceremony**: a 5-second countdown, then third place, the runner-up and the winner on a podium (with confetti and sound), then a chart of how the top three's wealth grew from 2026 to 2055 against the class average. Phones show "The winners are being revealed!" until the ceremony ends, then each learner's final result. Use **Full leaderboard** (or Esc) to see the top 10, and **Winners ceremony** on the results screen to replay it. Turn the laptop sound on for the countdown ticks and fanfare.
 
-To start over with a new class, open **Settings** and press **Reset game**. It permanently deletes every learner's portfolios and all results and takes the timeline back to 2026 with everyone on R500. (**Reset to defaults** in the same panel only resets the chapter wording and returns.)
+To start over with a new class, open **Settings** and press **Reset game**. It permanently deletes every learner's portfolios and all results and takes the timeline back to 2026 with everyone on R1000. (**Reset to defaults** in the same panel only resets the chapter wording and returns.)
 
 Rules of the journey:
 - A learner who doesn't submit in a chapter keeps their previous mix.
-- A learner who joins late starts with R500 in the chapter they join.
+- A learner who joins late starts with R1000 in the chapter they join.
 - Hover over a leaderboard row and press x to remove a player from the whole game.
 - **Timeline** goes back to the overview at any point; **View standings** shows the latest leaderboard.
 

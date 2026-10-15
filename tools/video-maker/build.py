@@ -2,17 +2,18 @@ import asyncio, json, subprocess, sys, os, wave
 import numpy as np
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(__file__))
-from chapters import CHAPTERS
+from chapters import CHAPTERS, LESSON
 
 D = os.path.dirname(os.path.abspath(__file__))
 SR = 44100
 FPS = 30
 VOICE = "en-US-AndrewNeural"
 QUESTIONS = {
-    "ai-boom": "How will you invest R500 for the next 5 years?",
+    "ai-boom": "How will you invest R1000 for the next 5 years?",
     "green-shift": "How will you invest your wealth for the next 15 years?",
     "global-shock": "How will you protect and grow your wealth for the next 4 years?",
     "sa-rising": "Your last move. The richest portfolio in 2055 wins.",
+    "investing-101": "Ready? Let's grow R1000 from 2026 to 2055.",
 }
 CHORDS = {  # frequencies (Hz) per mood, 4 chords looping
     "bright": [[261.6, 329.6, 392.0], [220.0, 261.6, 329.6], [174.6, 220.0, 261.6], [196.0, 246.9, 293.7]],
@@ -23,8 +24,14 @@ CHORDS = {  # frequencies (Hz) per mood, 4 chords looping
 def sh(cmd): return subprocess.run(cmd, check=True, capture_output=True, text=True).stdout
 
 def tts(text, path):
-    if not os.path.exists(path) or os.path.getsize(path) == 0:
-        sh(["edge-tts", "--voice", VOICE, "--rate=-4%", "--text", text, "--write-media", path])
+    import time
+    for attempt in range(5):
+        if os.path.exists(path) and os.path.getsize(path) > 0: return
+        try: sh(["edge-tts", "--voice", VOICE, "--rate=-4%", "--text", text, "--write-media", path])
+        except subprocess.CalledProcessError:
+            if os.path.exists(path): os.remove(path)
+            time.sleep(3 * (attempt + 1))
+    if not (os.path.exists(path) and os.path.getsize(path) > 0): raise RuntimeError("TTS failed: " + path)
 
 def load_audio(path):
     raw = subprocess.run(["ffmpeg", "-v", "quiet", "-i", path, "-f", "s16le", "-ac", "1", "-ar", str(SR), "-"], check=True, capture_output=True).stdout
@@ -71,7 +78,7 @@ async def render(ch, cfg, total, out_path, wav_path, preview=None):
             await br.close(); return
         nframes = int(total * FPS)
         ff = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "image2pipe", "-framerate", str(FPS), "-i", "-", "-i", wav_path,
-                               "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
+                               "-c:v", "libx264", "-preset", "medium", "-crf", os.environ.get("CRF", "20"), "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
                                "-movflags", "+faststart", "-shortest", out_path], stdin=subprocess.PIPE)
         for f in range(nframes):
             await p.evaluate(f"frame({f / FPS})")
@@ -91,9 +98,9 @@ def plan(ch):
 
 def build(ch, preview=None):
     scenes, voice, total = plan(ch)
-    heads = [s["head"] for s in scenes if s["type"] == "news"]
+    heads = [s["head"] for s in scenes if s["type"] in ("news", "learn")]
     cfg = {"n": ch["n"], "from": ch["from"], "year": ch["year"], "title": ch["title"], "mood": ch["mood"],
-           "question": QUESTIONS[ch["id"]], "ticker": ("     •     ".join(heads) + "     •     ") * 4, "scenes": scenes}
+           "question": QUESTIONS[ch["id"]], "closeKick": ch.get("closeKick"), "ticker": ("     •     ".join(heads) + "     •     ") * 4, "scenes": scenes}
     wav_path = os.path.join(D, f"{ch['id']}.wav"); out = os.path.join(D, f"{ch['id']}.mp4")
     if preview is None:
         n = int(total * SR) + SR; mix = np.zeros(n, np.float32)
@@ -107,6 +114,6 @@ def build(ch, preview=None):
 if __name__ == "__main__":
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
     prev = [float(x) for x in sys.argv[2].split(",")] if len(sys.argv) > 2 else None
-    for ch in CHAPTERS:
+    for ch in CHAPTERS + [LESSON]:
         if which in ("all", ch["id"]):
             print(ch["id"], round(build(ch, prev), 1), "s", flush=True)

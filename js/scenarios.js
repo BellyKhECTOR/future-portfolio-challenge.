@@ -1,22 +1,29 @@
 // Asset classes, the future "chapters" and the cumulative game maths.
 // The game is one journey: 2026 -> 2031 -> 2046 -> 2050 -> 2055.
-// Each learner starts with R500 in 2026. Whatever they have at the end of a
+// Each learner starts with R1000 in 2026. Whatever they have at the end of a
 // chapter is what they invest in the next one. Returns are illustrative, in rand,
 // and cumulative over each chapter's period (e.g. 2031 -> 2046 is 15 years).
 // Edit them here, or from the Settings panel on the presenter screen.
 
-export const STARTING_CAPITAL = 500; // R500 per learner
+export const STARTING_CAPITAL = 1000; // R1000 per learner
 export const START_YEAR = 2026;
 
 // Colours are from the Mazi palette only.
 export const ASSETS = [
-  { id: "saEq",   name: "SA Equity",            blurb: "Shares in JSE-listed companies",          colour: "#A65B5C" },
-  { id: "saBond", name: "SA Bonds",             blurb: "Loans to the SA government",              colour: "#DDB8B8" },
-  { id: "saProp", name: "SA Property",          blurb: "Listed malls, offices and warehouses",    colour: "#8A3A3B" },
-  { id: "saCash", name: "SA Cash",              blurb: "Money market - safe, steady interest",    colour: "#A8ACB1" },
-  { id: "glEq",   name: "Global Equity",        blurb: "Big companies in the US, Europe and Asia", colour: "#FDCDA2" },
-  { id: "glBond", name: "Global Bonds",         blurb: "Loans to foreign governments",            colour: "#E4E6E8" },
-  { id: "gold",   name: "Gold & Commodities",   blurb: "Gold, platinum, copper, oil",             colour: "#C39B53" },
+  { id: "saEq",   name: "SA Equity",            blurb: "Shares in JSE-listed companies",          colour: "#A65B5C",
+    explain: "You own a tiny slice of companies on the JSE, like Shoprite, MTN or Capitec. When they make profit selling groceries and airtime, your slice grows. Prices jump around a lot, but over many years shares usually grow the most." },
+  { id: "saBond", name: "SA Bonds",             blurb: "Loans to the SA government",              colour: "#DDB8B8",
+    explain: "You lend money to the SA government and it pays you interest - like lending your cousin R100 and getting R110 back next year. Steadier than shares, but grows more slowly." },
+  { id: "saProp", name: "SA Property",          blurb: "Listed malls, offices and warehouses",    colour: "#8A3A3B",
+    explain: "You own a piece of malls, offices and warehouses. Every shop pays rent each month and you get a share of it. Does well when the economy is strong, suffers when shops close." },
+  { id: "saCash", name: "SA Cash",              blurb: "Money market - safe, steady interest",    colour: "#A8ACB1",
+    explain: "Like a savings account at the bank. It never drops in value and earns small, steady interest - but it grows slowly. The tortoise in the race." },
+  { id: "glEq",   name: "Global Equity",        blurb: "Big companies in the US, Europe and Asia", colour: "#FDCDA2",
+    explain: "You own shares in big overseas companies like Apple, Amazon and Samsung - the makers of the phone in your pocket. Growth from the whole world, not just SA. A weaker rand makes it worth more rand." },
+  { id: "glBond", name: "Global Bonds",         blurb: "Loans to foreign governments",            colour: "#E4E6E8",
+    explain: "You lend money to governments like the USA, Germany and Japan. Usually very steady, but its value in rand goes up and down with the exchange rate." },
+  { id: "gold",   name: "Gold & Commodities",   blurb: "Gold, platinum, copper, oil",             colour: "#C39B53",
+    explain: "Raw materials like gold, platinum, copper and oil. SA mines much of the world's platinum. Prices jump when the world needs more, and gold often rises when people are scared." },
 ];
 
 // Played in this order. Each chapter runs from the previous chapter's year (or 2026).
@@ -85,7 +92,7 @@ export function portfolioValue(alloc, returns, capital = STARTING_CAPITAL) {
  * history: [{ roundId, returns }] for every revealed chapter, in order.
  * entriesByRound: { [roundId]: [{ uid, name, alloc, submittedAt }] }
  * A learner who skips a chapter keeps their previous mix. A learner who joins
- * late starts with R500 in the chapter they join.
+ * late starts with R1000 in the chapter they join.
  * Returns players sorted by wealth (highest first).
  */
 export function computeStandings(history, entriesByRound) {
@@ -112,7 +119,7 @@ export function computeStandings(history, entriesByRound) {
   return [...players.values()].sort((a, b) => b.wealth - a.wealth || a.joinedAt - b.joinedAt);
 }
 
-/** What R500 would have become with perfect foresight (all-in on the best asset every chapter). */
+/** What R1000 would have become with perfect foresight (all-in on the best asset every chapter). */
 export function perfectForesight(history) {
   let w = STARTING_CAPITAL;
   for (const h of history || []) w *= 1 + Math.max(...ASSETS.map((a) => Number(h.returns?.[a.id]) || 0)) / 100;

@@ -65,6 +65,13 @@
   .result-hero .rank { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: var(--card-2); font-weight: 700; }
   .lesson { background: var(--card); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px; margin: 18px 0; color: var(--muted); }
   .err { color: var(--red); font-size: 14px; margin-top: 8px; min-height: 18px; }
+  .why { background: none; border: 0; padding: 0; margin-left: 6px; color: var(--warm-sand); font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .asset .ex { margin-top: 10px; padding: 10px 12px; background: rgba(253,205,162,.08); border-left: 4px solid var(--warm-sand); border-radius: 8px; font-size: 14px; line-height: 1.45; color: var(--text); }
+  .learn-list { text-align: left; margin-top: 26px; }
+  .learn-list h2 { font-size: 18px; margin-bottom: 10px; color: var(--warm-sand); }
+  .learn-list .li { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+  .learn-list .li .t { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .learn-list .li p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); }
   .note { font-size: 14px; color: var(--muted); margin-top: 10px; }
   .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
   .stat-row div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: center; }
@@ -85,6 +92,7 @@
     <div class="pulse"></div>
     <h1>Eyes on the big screen</h1>
     <p class="muted" id="waitMsg">The portfolio builder opens as soon as the video ends.</p>
+    <div class="learn-list hidden" id="learnList"></div>
   </section>
 
   <section id="sBuild" class="screen hidden">
@@ -98,7 +106,7 @@
     <label class="name" for="nameIn">Your name or team name</label>
     <input id="nameIn" class="name-input" maxlength="20" autocomplete="off" placeholder="e.g. Thandi M">
 
-    <div class="capital"><span class="muted" id="capLabel">Your wealth to invest</span><strong id="capValue">R500</strong></div>
+    <div class="capital"><span class="muted" id="capLabel">Your wealth to invest</span><strong id="capValue">R1000</strong></div>
     <div id="assetList"></div>
   </section>
 
@@ -181,7 +189,7 @@ $("assetList").innerHTML = ASSETS.map((a) => `
   <div class="asset" data-id="${a.id}">
     <div class="top">
       <span class="dot" style="background:${a.colour}"></span>
-      <div><div class="nm">${a.name}</div><div class="bl">${a.blurb}</div></div>
+      <div><div class="nm">${a.name}</div><div class="bl">${a.blurb} <button class="why" data-why="${a.id}">What is this?</button></div></div>
       <div class="pct" id="p_${a.id}">0%</div>
     </div>
     <div class="row2">
@@ -189,6 +197,7 @@ $("assetList").innerHTML = ASSETS.map((a) => `
       <input type="range" min="0" max="100" step="1" value="0" id="r_${a.id}" aria-label="${a.name} percentage">
       <button class="step" data-d="5" aria-label="More ${a.name}">+</button>
     </div>
+    <div class="ex hidden" id="x_${a.id}">${a.explain}</div>
     <div class="rand" id="m_${a.id}">R0</div>
   </div>`).join("");
 
@@ -196,11 +205,14 @@ const totalPct = () => ASSETS.reduce((s, a) => s + alloc[a.id], 0);
 function setAlloc(id, v) { alloc[id] = Math.max(0, Math.min(100, Math.round(v))); render(); }
 $("assetList").addEventListener("input", (e) => { if (e.target.type === "range") setAlloc(e.target.id.slice(2), +e.target.value); });
 $("assetList").addEventListener("click", (e) => {
+  const w = e.target.closest(".why");
+  if (w) { const x = $("x_" + w.dataset.why); x.classList.toggle("hidden"); w.textContent = x.classList.contains("hidden") ? "What is this?" : "Hide"; return; }
   const b = e.target.closest(".step"); if (!b) return;
   const id = b.closest(".asset").dataset.id;
   setAlloc(id, alloc[id] + Number(b.dataset.d));
 });
 $("nameIn").addEventListener("input", render);
+$("learnList").innerHTML = `<h2>Meet the 7 investments</h2>` + ASSETS.map((a) => `<div class="li"><div class="t"><span class="dot" style="background:${a.colour}"></span>${a.name}</div><p>${a.explain}</p></div>`).join("");
 
 function render() {
   const t = totalPct(), w = myWealth();
@@ -254,6 +266,7 @@ function summaryHtml(a, returns) {
 function route() {
   const s = state;
   document.querySelector("#sWait h1").textContent = "Eyes on the big screen";
+  $("learnList").classList.toggle("hidden", !!(s && s.roundId && s.phase !== "idle") || history().length > 0);
   if (!s || !s.roundId || s.phase === "idle") {
     $("waitMsg").textContent = history().length ? "The next chapter starts soon. Your wealth is waiting for you." : "The portfolio builder opens as soon as the video ends.";
     return show("sWait");
@@ -267,7 +280,7 @@ function route() {
     $("scTag").textContent = s.tagline || "";
     $("buildIntro").innerHTML = me
       ? `It's ${s.fromYear}. Your portfolio is worth <strong style="color:var(--text)">${formatRand(me.wealth)}</strong>. Rebalance it for the next ${s.years} years - if you don't submit, your current mix carries on.`
-      : `It's ${s.fromYear}. You have <strong style="color:var(--text)">R500</strong> to invest for the next ${s.years} years. Split it so it adds up to exactly 100%. The richest portfolio at the end wins.`;
+      : `It's ${s.fromYear}. You have <strong style="color:var(--text)">R1000</strong> to invest for the next ${s.years} years. Split it so it adds up to exactly 100%. The richest portfolio at the end wins.`;
     $("capLabel").textContent = `Your wealth in ${s.fromYear}`;
     $("capValue").textContent = formatRand(myWealth());
     if (sub && !editing) {
