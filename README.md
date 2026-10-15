@@ -61,6 +61,8 @@ The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 20
 6. Press **Continue to 2046** and repeat.
 7. After the 2055 chapter, **Reveal results** starts the **winners ceremony**: a 5-second countdown, then third place, the runner-up and the winner on a podium (with confetti and sound), then a chart of how the top three's wealth grew from 2026 to 2055 against the class average. Phones show "The winners are being revealed!" until the ceremony ends, then each learner's final result. Use **Full leaderboard** (or Esc) to see the top 10, and **Winners ceremony** on the results screen to replay it. Turn the laptop sound on for the countdown ticks and fanfare.
 
+To start over with a new class, open **Settings** and press **Reset game**. It permanently deletes every learner's portfolios and all results and takes the timeline back to 2026 with everyone on R500. (**Reset to defaults** in the same panel only resets the chapter wording and returns.)
+
 Rules of the journey:
 - A learner who doesn't submit in a chapter keeps their previous mix.
 - A learner who joins late starts with R500 in the chapter they join.

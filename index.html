@@ -98,6 +98,8 @@
   .ed input { width: 100%; padding: 8px 10px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; }
   .ed .rets { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
   .ed .full { grid-column: 1 / -1; }
+  .btn.danger { background: var(--deep-red); color: var(--white); }
+  .btn.danger:hover { background: var(--deep-red-light); }
 
   .gate { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(29,38,51,.94); text-align: center; }
   .gate h2 { font-size: 30px; margin-bottom: 10px; }
@@ -324,6 +326,7 @@
   <div class="dlg-head">
     <h2>Chapters and returns</h2>
     <div class="row">
+      <button class="btn small danger" id="resetGameBtn">Reset game</button>
       <button class="btn ghost small" id="addSc">Add chapter</button>
       <button class="btn ghost small" id="resetSc">Reset to defaults</button>
       <button class="btn small" id="saveSc">Save</button>
@@ -755,6 +758,24 @@ function readSettings() {
   });
 }
 $("settingsBtn").addEventListener("click", () => { renderSettings(); $("settings").showModal(); });
+$("resetGameBtn").addEventListener("click", async () => {
+  if (!confirm("Reset the game from scratch?\n\nThis permanently deletes every learner's portfolios and all results, and takes the timeline back to 2026 with everyone on R500.")) return;
+  const btn = $("resetGameBtn"); btn.disabled = true; btn.textContent = "Resetting...";
+  try {
+    finaleRun++; $("finale").classList.add("hidden"); closeVideo(); clearInterval(timerInt); timerEnd = null;
+    const rounds = new Set([...history().map((h) => h.roundId), state?.roundId].filter(Boolean));
+    for (const r of rounds) {
+      const list = await backend.getEntries(r);
+      for (const e of list) await backend.deleteEntry(r, e.uid);
+      delete cache[r];
+    }
+    entries = [];
+    if (await writeState({ gameId: newId("g"), history: [], phase: "idle", roundId: null, scenarioId: null, returns: null, lesson: null })) {
+      $("settings").close(); renderHome(); showScreen("sHome"); toast("Game reset. Ready for a new class.");
+    }
+  } catch (e) { console.error(e); toast("Could not reset everything. Check you're signed in as the presenter."); }
+  finally { btn.disabled = false; btn.textContent = "Reset game"; }
+});
 $("addSc").addEventListener("click", () => {
   scenarios = readSettings();
   const lastYear = Number(scenarios[scenarios.length - 1]?.year) || START_YEAR;
