@@ -4,7 +4,7 @@ CHAPTERS = [
   {
     "id": "ai-boom", "n": 1, "from": 2026, "year": 2031, "title": "The AI Boom", "mood": "bright",
     "scenes": [
-      {"type": "travel", "say": "The year is twenty twenty-six, and you have ten million rand. Let's travel five years into the future."},
+      {"type": "travel", "say": "The year is twenty twenty-six, and you have five hundred rand. Let's travel five years into the future."},
       {"type": "news", "icon": "chip", "kicker": "Technology",
        "head": "AI now does half the world's office work",
        "sub": "Assistants write code, answer customers and run factories.",
@@ -17,7 +17,7 @@ CHAPTERS = [
        "head": "Local firms slower to adopt AI",
        "sub": "Interest rates steady. Cash and bonds pay a reliable return.",
        "say": "Here at home, South African companies are adopting AI more slowly. Interest rates are steady, so cash and bonds pay a reliable return."},
-      {"type": "close", "say": "Knowing what you know now, how will you invest your ten million rand for the next five years? Scan the QR code and build your portfolio."},
+      {"type": "close", "say": "Knowing what you know now, how will you invest your five hundred rand for the next five years? Scan the QR code and build your portfolio."},
     ],
   },
   {

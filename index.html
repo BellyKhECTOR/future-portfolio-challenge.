@@ -192,7 +192,7 @@
   <!-- HOME / TIMELINE -->
   <section id="sHome" class="screen">
     <div class="hero">
-      <h1>The future is coming.<br><em>Grow R10 million from 2026 to 2055.</em></h1>
+      <h1>The future is coming.<br><em>Grow R500 from 2026 to 2055.</em></h1>
       <p>One journey, four chapters. Each video jumps forward in time. Learners rebalance on their phones, and whatever they have grown carries into the next chapter. The richest portfolio in 2055 wins.</p>
     </div>
     <div class="tl" id="timeline"></div>
@@ -391,7 +391,7 @@ function renderHome() {
   const nxt = nextChapter();
   const list = chapters();
   $("timeline").innerHTML = `
-    <div class="node start"><div class="span">Today</div><div class="yr">${START_YEAR}</div><h3>The start</h3><p>Every learner gets R10 million to invest.</p><div class="st">R10m each</div></div>` +
+    <div class="node start"><div class="span">Today</div><div class="yr">${START_YEAR}</div><h3>The start</h3><p>Every learner gets R500 to invest.</p><div class="st">R500 each</div></div>` +
     list.map((c, i) => {
       const cls = done.has(c.id) ? "done" : c.id === nxt?.id ? "next" : "locked";
       const st = done.has(c.id) ? "Played" : c.id === nxt?.id ? "Up next" : "Locked";
@@ -405,7 +405,7 @@ function renderHome() {
 $("nextChapterBtn").addEventListener("click", () => { const c = nextChapter(); if (c) startRound(c); });
 $("standingsBtn").addEventListener("click", async () => { await ensureHistory(); renderResults(true); });
 $("newGameBtn").addEventListener("click", async () => {
-  if (history().length && !confirm("Start a new game? Everyone goes back to R10 million in 2026.")) return;
+  if (history().length && !confirm("Start a new game? Everyone goes back to R500 in 2026.")) return;
   if (await writeState({ gameId: newId("g"), history: [], phase: "idle", roundId: null, scenarioId: null, returns: null, lesson: null })) { entries = []; renderHome(); showScreen("sHome"); }
 });
 
@@ -461,7 +461,7 @@ function renderOpen() {
   $("openKick").textContent = `Chapter ${state?.chapter || ""} of ${state?.chapters || ""} - ${state?.fromYear} to ${state?.year} (${state?.years} years)`;
   $("openTitle").textContent = `${state?.year}: ${state?.title || ""}`;
   $("openTag").textContent = state?.tagline || "";
-  $("stepTwo").textContent = history().length ? "Rebalance your wealth - it carries into this chapter" : "Split your R10 million across the asset classes";
+  $("stepTwo").textContent = history().length ? "Rebalance your wealth - it carries into this chapter" : "Split your R500 across the asset classes";
   const url = playUrl();
   $("playUrl").textContent = url.replace(/^https?:\/\//, "");
   $("qr").innerHTML = "";

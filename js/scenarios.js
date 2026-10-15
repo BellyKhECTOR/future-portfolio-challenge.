@@ -1,11 +1,11 @@
 // Asset classes, the future "chapters" and the cumulative game maths.
 // The game is one journey: 2026 -> 2031 -> 2046 -> 2050 -> 2055.
-// Each learner starts with R10 million in 2026. Whatever they have at the end of a
+// Each learner starts with R500 in 2026. Whatever they have at the end of a
 // chapter is what they invest in the next one. Returns are illustrative, in rand,
 // and cumulative over each chapter's period (e.g. 2031 -> 2046 is 15 years).
 // Edit them here, or from the Settings panel on the presenter screen.
 
-export const STARTING_CAPITAL = 10_000_000; // R10 million per learner
+export const STARTING_CAPITAL = 500; // R500 per learner
 export const START_YEAR = 2026;
 
 // Colours are from the Mazi palette only.
@@ -85,7 +85,7 @@ export function portfolioValue(alloc, returns, capital = STARTING_CAPITAL) {
  * history: [{ roundId, returns }] for every revealed chapter, in order.
  * entriesByRound: { [roundId]: [{ uid, name, alloc, submittedAt }] }
  * A learner who skips a chapter keeps their previous mix. A learner who joins
- * late starts with R10 million in the chapter they join.
+ * late starts with R500 in the chapter they join.
  * Returns players sorted by wealth (highest first).
  */
 export function computeStandings(history, entriesByRound) {
@@ -112,7 +112,7 @@ export function computeStandings(history, entriesByRound) {
   return [...players.values()].sort((a, b) => b.wealth - a.wealth || a.joinedAt - b.joinedAt);
 }
 
-/** What R10m would have become with perfect foresight (all-in on the best asset every chapter). */
+/** What R500 would have become with perfect foresight (all-in on the best asset every chapter). */
 export function perfectForesight(history) {
   let w = STARTING_CAPITAL;
   for (const h of history || []) w *= 1 + Math.max(...ASSETS.map((a) => Number(h.returns?.[a.id]) || 0)) / 100;
@@ -128,7 +128,9 @@ export function formatRandShort(v) {
   const sign = v < 0 ? "-" : "";
   const a = Math.abs(v);
   if (a >= 1_000_000_000) return sign + "R" + (a / 1_000_000_000).toFixed(2) + "bn";
-  return sign + "R" + (a / 1_000_000).toFixed(a >= 100_000_000 ? 0 : 1) + "m";
+  if (a >= 1_000_000) return sign + "R" + (a / 1_000_000).toFixed(a >= 100_000_000 ? 0 : 1) + "m";
+  if (a >= 100_000) return sign + "R" + Math.round(a / 1000) + "k";
+  return formatRand(v);
 }
 
 export function formatPct(p) {

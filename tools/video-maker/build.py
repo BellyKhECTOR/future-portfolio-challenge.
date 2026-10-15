@@ -7,9 +7,9 @@ from chapters import CHAPTERS
 D = os.path.dirname(os.path.abspath(__file__))
 SR = 44100
 FPS = 30
-VOICE = "en-ZA-LeahNeural"
+VOICE = "en-US-AndrewNeural"
 QUESTIONS = {
-    "ai-boom": "How will you invest R10 million for the next 5 years?",
+    "ai-boom": "How will you invest R500 for the next 5 years?",
     "green-shift": "How will you invest your wealth for the next 15 years?",
     "global-shock": "How will you protect and grow your wealth for the next 4 years?",
     "sa-rising": "Your last move. The richest portfolio in 2055 wins.",

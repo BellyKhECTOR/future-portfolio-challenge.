@@ -1,6 +1,6 @@
 # Chapter video maker
 
-Rebuilds the four "Future News" chapter videos (1920x1080, South African English narration, Mazi branding).
+Rebuilds the four "Future News" chapter videos (1920x1080, American English male narration - voice set by VOICE in build.py - Mazi branding).
 
 Edit the scripts in `chapters.py`, then:
 

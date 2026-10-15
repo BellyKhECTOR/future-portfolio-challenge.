@@ -1,6 +1,6 @@
 # Future Portfolio Challenge - setup guide
 
-A live classroom game: a scenario video plays, a QR code appears, learners build a R10 million portfolio on their phones (no login), and the top 10 appear on a leaderboard.
+A live classroom game: a scenario video plays, a QR code appears, learners build a R500 portfolio on their phones (no login), and the top 10 appear on a leaderboard.
 
 ## What's in the folder
 
@@ -51,7 +51,7 @@ You can change years, titles, taglines, video names, lessons and returns in **Se
 
 ## Running a session
 
-The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 2055**. Every learner starts with R10 million, and whatever they grow carries into the next chapter. The richest portfolio in 2055 wins.
+The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 2055**. Every learner starts with R500, and whatever they grow carries into the next chapter. The richest portfolio in 2055 wins.
 
 1. Open the site on the projector laptop in Edge, sign in with Google, press **Full screen**. Press **New game** to start fresh.
 2. Press **Start the journey: 2031**. The video plays full screen.
@@ -63,7 +63,7 @@ The game is one journey with four chapters: **2026 -> 2031 -> 2046 -> 2050 -> 20
 
 Rules of the journey:
 - A learner who doesn't submit in a chapter keeps their previous mix.
-- A learner who joins late starts with R10 million in the chapter they join.
+- A learner who joins late starts with R500 in the chapter they join.
 - Hover over a leaderboard row and press x to remove a player from the whole game.
 - **Timeline** goes back to the overview at any point; **View standings** shows the latest leaderboard.
 

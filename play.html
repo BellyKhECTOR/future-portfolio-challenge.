@@ -98,7 +98,7 @@
     <label class="name" for="nameIn">Your name or team name</label>
     <input id="nameIn" class="name-input" maxlength="20" autocomplete="off" placeholder="e.g. Thandi M">
 
-    <div class="capital"><span class="muted" id="capLabel">Your wealth to invest</span><strong id="capValue">R10 000 000</strong></div>
+    <div class="capital"><span class="muted" id="capLabel">Your wealth to invest</span><strong id="capValue">R500</strong></div>
     <div id="assetList"></div>
   </section>
 
@@ -267,7 +267,7 @@ function route() {
     $("scTag").textContent = s.tagline || "";
     $("buildIntro").innerHTML = me
       ? `It's ${s.fromYear}. Your portfolio is worth <strong style="color:var(--text)">${formatRand(me.wealth)}</strong>. Rebalance it for the next ${s.years} years - if you don't submit, your current mix carries on.`
-      : `It's ${s.fromYear}. You have <strong style="color:var(--text)">R10 million</strong> to invest for the next ${s.years} years. Split it so it adds up to exactly 100%. The richest portfolio at the end wins.`;
+      : `It's ${s.fromYear}. You have <strong style="color:var(--text)">R500</strong> to invest for the next ${s.years} years. Split it so it adds up to exactly 100%. The richest portfolio at the end wins.`;
     $("capLabel").textContent = `Your wealth in ${s.fromYear}`;
     $("capValue").textContent = formatRand(myWealth());
     if (sub && !editing) {
