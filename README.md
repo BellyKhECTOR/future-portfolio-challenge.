@@ -85,7 +85,7 @@ A shareable version for the internet: one video, entries collected privately, re
 
 | File | What it is |
 |---|---|
-| `videos/competition.mp4` | The competition video (about 3 min 40 s, 1080p, 46 MB). Rules, Chapter 1 *The AI Boom* (2026-2031), Chapter 2 *The Great Slowdown* (2031-2036), then a full-screen QR code. A small QR code stays in the corner throughout. |
+| `videos/competition.mp4` | The competition video (about 4 min 20 s, 1080p, 52 MB). Rules, the 7 investments explained with everyday examples, a key idea on risk, Chapter 1 *The AI Boom* (2026-2031), Chapter 2 *The Great Slowdown* (2031-2036), then a full-screen QR code. A small QR code stays in the corner throughout. |
 | `enter.html` | The entry page the QR code opens: name, email, cellphone, under-18 question (with parent/guardian consent), POPIA consent, then the R1000 split for each chapter. One entry per device; entries can't be changed. No results are shown. |
 | `results.html` | The private organiser page (presenter Google account only): open/close entries, enter the secret returns, see the ranking, flag duplicates, delete entries, download a CSV. |
 

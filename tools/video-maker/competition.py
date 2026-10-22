@@ -1,4 +1,4 @@
-# Competition video: rules, two chapters (boom, then crash), and how to enter. No prize, closing date or explainer.
+# Competition video: rules, two chapters (boom, then crash), and how to enter. No prize or closing date. Includes a short explainer of the 7 investments.
 ENTRY_URL = "https://bellykhector.github.io/future-portfolio-challenge./enter.html"
 
 COMP = {
@@ -16,6 +16,24 @@ COMP = {
      "head": "Highest value in 2036 wins", "sub": "One entry per person. Winners announced after the competition closes.",
      "ex": "Scan the QR code in the corner - or screenshot it - and submit both portfolios on the entry page.",
      "say": "The entry with the highest value in twenty thirty-six wins. To enter, scan the QR code in the corner of your screen, or take a screenshot of it, and submit both of your portfolios on the entry page. One entry per person. The winners will be announced after the competition closes."},
+
+    {"type": "grid", "hdr": "YOUR 7 INVESTMENTS", "yr": 2026, "kicker": "Your 7 investments", "head": "In South Africa",
+     "items": [
+       {"n": "SA Equity", "c": "#A65B5C", "d": "Own a slice of JSE companies like Shoprite and MTN. Grows most over time, but bumpy."},
+       {"n": "SA Bonds", "c": "#DDB8B8", "d": "Lend to the government and earn interest - like lending your cousin R100 and getting R110 back."},
+       {"n": "SA Property", "c": "#8A3A3B", "d": "Earn rent from malls, offices and warehouses."},
+       {"n": "SA Cash", "c": "#A8ACB1", "d": "Like a savings account. Safe and steady, but slow."}],
+     "say": "First, let's meet your seven investments. In South Africa: SA Equity, also called shares, means owning a slice of companies on the Johannesburg Stock Exchange, like Shoprite or MTN. When they make profit selling groceries and airtime, your slice grows. Shares usually grow the most over time, but the ride is bumpy. SA Bonds means lending money to the government and earning interest, like lending your cousin one hundred rand and getting one hundred and ten back. Steadier, but slower. SA Property earns rent from malls, offices and warehouses. And SA Cash is like a savings account at the bank. Safe and steady, but slow."},
+    {"type": "grid", "hdr": "YOUR 7 INVESTMENTS", "yr": 2026, "kicker": "Your 7 investments", "head": "Around the world",
+     "items": [
+       {"n": "Global Equity", "c": "#FDCDA2", "d": "Shares in giants like Apple, Amazon and Samsung."},
+       {"n": "Global Bonds", "c": "#E4E6E8", "d": "Loans to governments like the USA and Germany."},
+       {"n": "Gold & Commodities", "c": "#C39B53", "d": "Gold, platinum, copper and oil from the ground."}],
+     "say": "And around the world: Global Equity means owning shares in giants like Apple, Amazon and Samsung, the makers of the phone in your pocket. Global Bonds are loans to governments like the United States and Germany. And Gold and Commodities are things dug from the ground, like gold, platinum and oil. When the world needs more of them, their prices jump, and gold often rises when people are scared. One more thing: when the rand weakens, overseas investments are worth more rand. When the rand strengthens, they are worth less."},
+    {"type": "learn", "icon": "scales", "hdr": "KEY IDEA", "yr": 2026, "kicker": "Key idea", "exLabel": "REMEMBER",
+     "head": "More growth means a bumpier ride", "sub": "Risk and return go together.",
+     "ex": "Shares are a fast taxi: quicker, but bumpy. Cash is walking: slow, but steady. Spreading your money protects you.",
+     "say": "Remember: the investments that can grow the most usually have the bumpiest ride. Shares are like a fast taxi. Cash is like walking. And spreading your money across different investments protects you when the future surprises you."},
 
     # ---------- Chapter 1: 2026 -> 2031, The AI Boom ----------
     {"type": "travel", "hdr": "CHAPTER 1 OF 2", "chapN": 1, "from": 2026, "to": 2031, "title": "The AI Boom",
