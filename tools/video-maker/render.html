@@ -47,6 +47,28 @@
   .learn .ex b { display: block; font-family: Oswald; font-weight: 500; letter-spacing: .14em; color: var(--sand); font-size: 24px; margin-bottom: 6px; }
   .learn .iconbox { width: 520px; height: 520px; border-radius: 40px; background: rgba(57,64,76,.55); border: 2px solid var(--navy3); display: grid; place-items: center; }
   .learn svg { width: 410px; height: 410px; overflow: visible; }
+  /* grid of investments */
+  .grid { display: flex; flex-direction: column; padding: 170px 120px 300px; }
+  .grid .kick { display: inline-block; align-self: flex-start; background: var(--red); color: #fff; font-family: Oswald; letter-spacing: .16em; font-size: 28px; padding: 8px 22px; border-radius: 8px; text-transform: uppercase; }
+  .grid .head { font-size: 70px; font-weight: 600; line-height: 1.06; margin: 20px 0 30px; }
+  .grid .cards { display: grid; gap: 22px; }
+  .grid .card { background: rgba(57,64,76,.6); border: 2px solid var(--navy3); border-radius: 22px; padding: 26px 28px; }
+  .grid .card .n { display: flex; align-items: center; gap: 14px; font-size: 38px; font-weight: 700; }
+  .grid .card .n i { width: 22px; height: 22px; border-radius: 6px; display: inline-block; }
+  .grid .card p { font-size: 30px; color: var(--mist); line-height: 1.3; margin-top: 10px; }
+  /* enter */
+  .enter { display: grid; grid-template-columns: 560px 1fr; gap: 90px; align-items: center; padding: 170px 140px 200px; }
+  .enter .qrbig { background: #fff; border-radius: 34px; padding: 30px; border-top: 12px solid var(--red); }
+  .enter .qrbig img { width: 100%; display: block; image-rendering: pixelated; }
+  .enter .k { font-family: Oswald; letter-spacing: .2em; color: var(--sand); font-size: 40px; }
+  .enter .h { font-size: 104px; font-weight: 700; line-height: 1.02; margin: 14px 0 30px; }
+  .enter ol { font-size: 40px; line-height: 1.55; padding-left: 50px; color: var(--white); }
+  .enter .url { margin-top: 26px; font-size: 30px; color: var(--sand); word-break: break-all; }
+  /* corner QR */
+  .cqr { position: absolute; right: 48px; bottom: 98px; width: 220px; background: #fff; border-radius: 18px; padding: 12px 12px 8px; text-align: center; border-top: 6px solid var(--red); display: none; }
+  .cqr img { width: 100%; display: block; image-rendering: pixelated; }
+  .cqr b { display: block; font-family: Oswald; color: var(--navy); letter-spacing: .12em; font-size: 22px; margin-top: 4px; }
+  .cap.withqr { right: 300px; left: 120px; }
   /* close */
   .close { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 200px 220px; }
   .close .its { font-family: Oswald; letter-spacing: .2em; color: var(--sand); font-size: 40px; }
@@ -60,6 +82,7 @@
 <div class="brand"><img class="m" src="mazi-logo.svg"><span class="div"></span><img class="a" src="mazi-20-years.svg"></div>
 <div class="chap"><div class="k" id="chapK"></div><div class="y" id="chapY"></div></div>
 <div class="cap" id="cap"></div>
+<div class="cqr" id="cqr"><img id="cqrImg" alt=""><b>SCAN TO ENTER</b></div>
 <div class="ticker"><div class="lbl">FUTURE NEWS</div><div class="run" id="run"></div></div>
 <script>
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
@@ -144,21 +167,25 @@ const ICONS = {
 function setup(cfg) {
   CFG = cfg;
   document.getElementById("chapK").textContent = cfg.n ? `CHAPTER ${cfg.n} OF 4` : "INVESTING 101";
+  if (cfg.qr) document.getElementById("cqrImg").src = cfg.qr;
   document.getElementById("run").textContent = cfg.ticker;
 }
 
 function buildScene(i) {
   const s = CFG.scenes[i], el = document.getElementById("scene");
-  if (s.type === "travel") el.innerHTML = `<div class="layer travel"><div class="sub" id="tSub">CHAPTER ${CFG.n} - ${CFG.year - CFG.from} YEARS LATER</div><div class="num" id="tNum"></div><div class="ttl" id="tTtl">${CFG.title}</div></div>`;
-  if (s.type === "news") el.innerHTML = `<div class="layer news"><div><div id="nk"><span class="kick">${s.kicker}</span><span class="dt">${CFG.year}</span></div><div class="head" id="nh">${s.head}</div><div class="sub2" id="ns">${s.sub}</div></div><div class="iconbox" id="ib"><svg viewBox="0 0 200 200" id="ic"></svg></div></div>`;
-  if (s.type === "title") el.innerHTML = `<div class="layer title"><div class="big" id="ttB">INVESTING <span>101</span></div><div class="tag" id="ttT">How money grows - before we travel to the future</div></div>`;
+  const F = s.from ?? CFG.from, Y = s.to ?? CFG.year;
+  if (s.type === "travel") el.innerHTML = `<div class="layer travel"><div class="sub" id="tSub">CHAPTER ${s.chapN ?? CFG.n} - ${Y - F} YEARS LATER</div><div class="num" id="tNum"></div><div class="ttl" id="tTtl">${s.title ?? CFG.title}</div></div>`;
+  if (s.type === "news") el.innerHTML = `<div class="layer news"><div><div id="nk"><span class="kick">${s.kicker}</span><span class="dt">${s.yr ?? CFG.year}</span></div><div class="head" id="nh">${s.head}</div><div class="sub2" id="ns">${s.sub}</div></div><div class="iconbox" id="ib"><svg viewBox="0 0 200 200" id="ic"></svg></div></div>`;
+  if (s.type === "title") el.innerHTML = `<div class="layer title"><div class="big" id="ttB" style="${s.bigSize ? `font-size:${s.bigSize}px` : ""}">${s.big ?? "INVESTING <span>101</span>"}</div><div class="tag" id="ttT">${s.tag ?? "How money grows - before we travel to the future"}</div></div>`;
   if (s.type === "learn") el.innerHTML = `<div class="layer learn"><div><div id="nk"><span class="kick">${s.kicker}</span></div><div class="head" id="nh">${s.head}</div><div class="sub2" id="ns">${s.sub}</div><div class="ex" id="nx"><b>${s.exLabel || "EVERYDAY EXAMPLE"}</b>${s.ex}</div></div><div class="iconbox" id="ib"><svg viewBox="0 0 200 200" id="ic"></svg></div></div>`;
-  if (s.type === "close") el.innerHTML = `<div class="layer close"><div class="its" id="ci">${CFG.closeKick || `IT'S ${CFG.from}. YOU'VE SEEN THE FUTURE.`}</div><div class="q" id="cq">${CFG.question}</div><div class="scan" id="cs"><svg viewBox="0 0 75 75" style="color:var(--navy)">${ICONS.qr()}</svg>Scan the QR code</div></div>`;
+  if (s.type === "close") el.innerHTML = `<div class="layer close"><div class="its" id="ci">${s.closeKick ?? CFG.closeKick ?? `IT'S ${CFG.from}. YOU'VE SEEN THE FUTURE.`}</div><div class="q" id="cq">${s.q ?? CFG.question}</div><div class="scan" id="cs"><svg viewBox="0 0 75 75" style="color:var(--navy)">${ICONS.qr()}</svg>${s.btn ?? "Scan the QR code"}</div></div>`;
+  if (s.type === "grid") el.innerHTML = `<div class="layer grid"><span class="kick" id="nk">${s.kicker}</span><div class="head" id="nh">${s.head}</div><div class="cards" style="grid-template-columns:repeat(${s.items.length},1fr)">${s.items.map((it, k) => `<div class="card" id="gc${k}"><div class="n"><i style="background:${it.c}"></i>${it.n}</div><p>${it.d}</p></div>`).join("")}</div></div>`;
+  if (s.type === "enter") el.innerHTML = `<div class="layer enter"><div class="qrbig" id="eq"><img src="${CFG.qr}" alt=""></div><div><div class="k" id="ek">${s.kick}</div><div class="h" id="eh">${s.h}</div><ol id="eo">${s.steps.map((x) => `<li>${x}</li>`).join("")}</ol><div class="url" id="eu">${CFG.url || ""}</div></div></div>`;
 }
 
 function drawBg(t, s, lt) {
   const g = ctx.createRadialGradient(960, 480, 100, 960, 540, 1200);
-  const dark = CFG.mood === "dark";
+  const dark = (s.mood ?? CFG.mood) === "dark";
   g.addColorStop(0, dark ? "#3a1a22" : "#2c3646"); g.addColorStop(1, "#151c27");
   ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1080);
   // grid
@@ -188,16 +215,20 @@ function frame(t) {
   const fadeOut = clamp((s.start + s.dur - t) / 0.4);
   document.getElementById("scene").style.opacity = Math.min(clamp(lt / 0.35), i === CFG.scenes.length - 1 ? 1 : fadeOut);
   // header year
-  const shownYear = s.type === "travel" ? Math.round(CFG.from + (CFG.year - CFG.from) * ease((lt - 0.6) / 3.2)) : (s.type === "close" ? CFG.from : CFG.year);
+  const F = s.from ?? CFG.from, Y = s.to ?? CFG.year;
+  const shownYear = s.type === "travel" ? Math.round(F + (Y - F) * ease((lt - 0.6) / 3.2)) : (s.yr ?? (s.type === "close" ? CFG.from : CFG.year));
   document.getElementById("chapY").textContent = shownYear;
+  if (s.hdr) document.getElementById("chapK").textContent = s.hdr;
+  const showQR = !!CFG.qr && s.type !== "enter";
+  document.getElementById("cqr").style.display = showQR ? "block" : "none";
   // captions
-  document.getElementById("cap").innerHTML = `<span>${s.say}</span>`; document.getElementById("cap").className = "cap" + (s.say.length > 230 ? " small" : "");
+  document.getElementById("cap").innerHTML = `<span>${s.say}</span>`; document.getElementById("cap").className = "cap" + (s.say.length > 230 ? " small" : "") + (showQR ? " withqr" : "");
   document.getElementById("cap").style.opacity = clamp(lt / 0.3) * fadeOut;
   // ticker
   document.getElementById("run").style.transform = `translateX(${-(t * 140) % 2400}px)`;
   if (s.type === "travel") {
     const p = ease((lt - 0.6) / 3.2);
-    const n = document.getElementById("tNum"); n.textContent = Math.round(CFG.from + (CFG.year - CFG.from) * p);
+    const n = document.getElementById("tNum"); n.textContent = Math.round(F + (Y - F) * p);
     n.style.transform = `scale(${1 + 0.08 * Math.sin(p * Math.PI)})`; n.style.color = p >= 1 ? "var(--sand)" : "#fff";
     document.getElementById("tSub").style.opacity = clamp(lt / 0.6);
     const tt = document.getElementById("tTtl"); tt.style.opacity = clamp((lt - 3.9) / 0.6); tt.style.transform = `translateY(${30 * (1 - out((lt - 3.9) / 0.6))}px)`;
@@ -217,6 +248,16 @@ function frame(t) {
     a("nk", 0.1); a("nh", 0.35); a("ns", 0.9);
     const ib = document.getElementById("ib"); ib.style.opacity = clamp((lt - 0.4) / 0.5); ib.style.transform = `scale(${0.9 + 0.1 * out((lt - 0.4) / 0.6)})`;
     document.getElementById("ic").innerHTML = ICONS[s.icon](clamp((lt - 0.6) / 2.2), t);
+  }
+  if (s.type === "grid") {
+    const a = (id, d) => { const e = document.getElementById(id); e.style.opacity = clamp((lt - d) / 0.5); e.style.transform = `translateY(${30 * (1 - out((lt - d) / 0.6))}px)`; };
+    a("nk", 0.1); a("nh", 0.35);
+    const n = s.items.length, span = Math.max(2, s.dur - 3);
+    s.items.forEach((_, k) => a("gc" + k, 1.0 + k * span / n));
+  }
+  if (s.type === "enter") {
+    const eq = document.getElementById("eq"); eq.style.opacity = clamp(lt / 0.5); eq.style.transform = `scale(${0.9 + 0.1 * out(lt / 0.7)})`;
+    ["ek", "eh", "eo", "eu"].forEach((id, k) => { const e = document.getElementById(id); e.style.opacity = clamp((lt - 0.4 - k * 0.35) / 0.5); e.style.transform = `translateX(${40 * (1 - out((lt - 0.4 - k * 0.35) / 0.6))}px)`; });
   }
   if (s.type === "close") {
     const ci = document.getElementById("ci"); ci.style.opacity = clamp(lt / 0.5);

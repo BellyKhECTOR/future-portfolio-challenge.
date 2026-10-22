@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Enter the Future Portfolio Challenge</title>
+<meta name="description" content="Grow R1000 across two futures - Mazi Asset Management">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  main { max-width: 620px; margin: 0 auto; padding: 18px 16px 130px; }
+  header.brandbar { justify-content: space-between; margin: -18px -16px 18px; padding: 10px 16px; }
+  header.brandbar img.mazi { height: 30px; }
+  header.brandbar .title { font-size: 12px; flex: 1; }
+  header.brandbar img.anniv { height: 30px; }
+  .hero { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--deep-red); border-radius: var(--radius); padding: 18px; }
+  .kicker { font-family: var(--condensed); font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); }
+  .hero h1 { font-size: 28px; margin: 6px 0 8px; }
+  .hero p { margin: 0 0 6px; color: var(--muted); line-height: 1.5; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .facts div { background: var(--bg-2); border-radius: 10px; padding: 10px 12px; }
+  .facts b { display: block; font-size: 15px; } .facts span { font-size: 12px; color: var(--muted); }
+  .hero a { color: var(--warm-sand); }
+  section.step { margin-top: 22px; }
+  .step h2 { font-size: 20px; margin-bottom: 4px; }
+  .step .hint { color: var(--muted); font-size: 14px; margin: 0 0 12px; line-height: 1.45; }
+  label.f { display: block; font-weight: 600; font-size: 14px; margin: 12px 0 6px; }
+  .in { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font-size: 16px; }
+  .in:focus { outline: 2px solid var(--gold); border-color: transparent; }
+  .radios { display: flex; gap: 10px; }
+  .radios label { flex: 1; display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-2); font-weight: 600; }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; margin-top: 12px; color: var(--text); }
+  .check input { width: 20px; height: 20px; margin-top: 1px; flex: none; accent-color: var(--gold); }
+  .chap { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--deep-red); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .chap h3 { font-size: 22px; margin: 4px 0 8px; }
+  .chap ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .asset { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; }
+  .asset .top { display: flex; align-items: center; gap: 10px; }
+  .dot { width: 12px; height: 12px; border-radius: 4px; flex: none; display: inline-block; }
+  .asset .nm { font-weight: 700; }
+  .asset .bl { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .asset .pct { margin-left: auto; font-family: var(--display); font-size: 22px; font-weight: 600; min-width: 60px; text-align: right; }
+  .asset .row2 { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .stp { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--card-2); color: var(--text); font-size: 20px; font-weight: 700; flex: none; }
+  input[type=range] { flex: 1; accent-color: var(--gold); height: 28px; }
+  .why { background: none; border: 0; padding: 0; margin-left: 4px; color: var(--warm-sand); font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .asset .ex { margin-top: 8px; padding: 10px 12px; background: rgba(253,205,162,.08); border-left: 4px solid var(--warm-sand); border-radius: 8px; font-size: 14px; line-height: 1.45; }
+  .tot { display: flex; align-items: center; justify-content: space-between; margin: 6px 2px 0; font-weight: 700; }
+  .tot.ok { color: var(--green); } .tot.over { color: var(--red); }
+  .meter { height: 8px; border-radius: 999px; background: var(--card-2); overflow: hidden; display: flex; margin-top: 6px; }
+  .meter span { height: 100%; }
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(29,38,51,.96); backdrop-filter: blur(10px); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); z-index: 10; }
+  .dock-inner { max-width: 620px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .dock .msg { font-size: 14px; color: var(--muted); }
+  .dock .msg.err { color: var(--red); }
+  .center { text-align: center; padding: 40px 10px; }
+  .center h1 { font-size: 28px; margin: 14px 0 8px; }
+  .tick { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto; background: var(--anniversary-gold); display: grid; place-items: center; color: var(--charcoal-navy); font-size: 34px; font-weight: 800; }
+  .sum { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-top: 16px; }
+  .sum h3 { font-size: 16px; margin: 0 0 6px; color: var(--warm-sand); }
+  .sum .r { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px; border-bottom: 1px solid var(--line); }
+  .sum .r:last-child { border: 0; } .sum .r .v { margin-left: auto; font-weight: 700; }
+  .terms { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 22px; }
+  .terms summary { cursor: pointer; color: var(--text); font-weight: 600; font-size: 14px; }
+  .terms li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+  <header class="brandbar">
+    <img class="mazi" src="img/mazi-logo.svg" alt="Mazi Asset Management">
+    <div class="title">Future Portfolio Challenge</div>
+    <img class="anniv" src="img/mazi-20-years.svg" alt="Mazi 20 years">
+    <span id="modeBadge" class="badge">...</span>
+  </header>
+
+  <section id="sLoad" class="center"><p class="muted">Loading...</p></section>
+
+  <section id="sClosed" class="center hidden">
+    <div class="tick" style="background:var(--card-2);color:var(--text)">&#8987;</div>
+    <h1 id="closedTitle">Entries are closed</h1>
+    <p class="muted" id="closedMsg">This competition isn't accepting entries right now. Results will be announced soon.</p>
+  </section>
+
+  <section id="sDone" class="center hidden">
+    <div class="tick">&#10003;</div>
+    <h1 id="doneTitle">You're in!</h1>
+    <p class="muted" id="doneMsg">Your entry has been received. Results will be announced after the competition closes. Good luck!</p>
+    <div id="doneSum"></div>
+  </section>
+
+  <form id="sForm" class="hidden" novalidate>
+    <div class="hero">
+      <div class="kicker">Mazi Asset Management - competition entry</div>
+      <h1>Grow R1000 across two futures</h1>
+      <p>Watched the video? Split your <b>R1000</b> across 7 investments for each chapter. The entry worth the most in 2036 wins.</p>
+      <p style="margin-top:10px"><a id="videoLink" href="#" target="_blank" rel="noopener">Watch the video again</a></p>
+    </div>
+
+    <section class="step">
+      <h2>1. Your details</h2>
+      <p class="hint">So we can contact you if you win. One entry per person.</p>
+      <label class="f" for="fName">Full name</label>
+      <input class="in" id="fName" autocomplete="name" maxlength="60" required>
+      <label class="f" for="fEmail">Email address</label>
+      <input class="in" id="fEmail" type="email" autocomplete="email" maxlength="120" required>
+      <label class="f" for="fPhone">Cellphone number</label>
+      <input class="in" id="fPhone" type="tel" autocomplete="tel" maxlength="20" placeholder="e.g. 082 123 4567" required>
+      <label class="f">Are you under 18?</label>
+      <div class="radios">
+        <label><input type="radio" name="age" value="no"> No, I'm 18+</label>
+        <label><input type="radio" name="age" value="yes"> Yes</label>
+      </div>
+      <div id="guardianBox" class="hidden">
+        <label class="f" for="fGuardian">Parent or guardian's full name</label>
+        <input class="in" id="fGuardian" maxlength="60">
+        <label class="check"><input type="checkbox" id="fGuardianOk"> My parent or guardian knows I'm entering and agrees that Mazi may store my details for this competition.</label>
+      </div>
+    </section>
+
+    <section class="step" id="chapters"></section>
+
+    <section class="step">
+      <h2>4. Submit</h2>
+      <label class="check"><input type="checkbox" id="fConsent"> I agree that Mazi Asset Management may store my details only to run this competition and contact the winners. My details won't be shared or used for marketing, and I can ask for them to be deleted.</label>
+      <label class="check"><input type="checkbox" id="fFinal"> I understand that I can only enter once and can't change my portfolios after submitting.</label>
+      <details class="terms">
+        <summary>Competition rules</summary>
+        <ul>
+          <li>Each entrant starts with R1000 of pretend money. Chapter 1 runs from 2026 to 2031; chapter 2 from 2031 to 2036. Whatever your chapter 1 portfolio grows to is invested using your chapter 2 split.</li>
+          <li>The returns for each investment are set by Mazi before the competition opens and are revealed with the results. The entry with the highest value in 2036 wins. Ties go to the earlier entry.</li>
+          <li>One entry per person. Duplicate entries (same email or phone) may be disqualified - only the first one counts.</li>
+          <li>Entries are accepted until the competition closes. Winners will be contacted using the details provided. Results are not shown when you enter - they are announced after the competition closes.</li>
+          <li>This is an educational game. It is not financial advice, and no real money is invested.</li>
+        </ul>
+      </details>
+    </section>
+  </form>
+</main>
+
+<div class="dock hidden" id="dock"><div class="dock-inner"><div class="msg" id="dockMsg">Complete all steps to submit</div><button class="btn" id="submitBtn" type="button">Submit entry</button></div></div>
+
+<script type="module">
+import { createCompBackend } from "./js/compbackend.js";
+import { COMPETITION, COMP_CHAPTERS } from "./js/competition.js";
+import { ASSETS, STARTING_CAPITAL, formatRand } from "./js/scenarios.js";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const views = ["sLoad", "sClosed", "sDone", "sForm"];
+const show = (id) => { views.forEach((v) => $(v).classList.toggle("hidden", v !== id)); $("dock").classList.toggle("hidden", id !== "sForm"); };
+
+let backend, uid, cfg;
+const alloc = {};
+COMP_CHAPTERS.forEach((c) => { alloc[c.key] = Object.fromEntries(ASSETS.map((a) => [a.id, 0])); });
+
+/* ---------- chapter allocators ---------- */
+$("chapters").innerHTML = COMP_CHAPTERS.map((c, ci) => `
+  <h2>${ci + 2}. Chapter ${c.n}: ${c.from} to ${c.to}</h2>
+  <p class="hint">${ci === 0 ? `Split your R1000 for ${c.from} to ${c.to}.` : `Whatever you grew by ${c.from} is invested with this split for ${c.from} to ${c.to}.`}</p>
+  <div class="chap"><div class="kicker">The news in ${c.to}</div><h3>${esc(c.title)}</h3><ul>${c.news.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></div>
+  ${ASSETS.map((a) => `
+    <div class="asset" data-k="${c.key}" data-id="${a.id}">
+      <div class="top"><span class="dot" style="background:${a.colour}"></span>
+        <div><div class="nm">${a.name}</div><div class="bl">${a.blurb} <button type="button" class="why">What is this?</button></div></div>
+        <div class="pct" id="p_${c.key}_${a.id}">0%</div></div>
+      <div class="row2"><button type="button" class="stp" data-d="-5" aria-label="Less ${a.name}">&minus;</button>
+        <input type="range" min="0" max="100" step="1" value="0" id="r_${c.key}_${a.id}" aria-label="${a.name} percentage, chapter ${c.n}">
+        <button type="button" class="stp" data-d="5" aria-label="More ${a.name}">+</button></div>
+      <div class="ex hidden">${a.explain || ""}</div>
+    </div>`).join("")}
+  <div class="meter" id="m_${c.key}"></div>
+  <div class="tot" id="t_${c.key}">0% allocated</div>
+  <div style="height:18px"></div>`).join("");
+
+const total = (k) => ASSETS.reduce((s, a) => s + alloc[k][a.id], 0);
+function renderAlloc() {
+  COMP_CHAPTERS.forEach((c) => {
+    ASSETS.forEach((a) => { $(`p_${c.key}_${a.id}`).textContent = alloc[c.key][a.id] + "%"; $(`r_${c.key}_${a.id}`).value = alloc[c.key][a.id]; });
+    $("m_" + c.key).innerHTML = ASSETS.map((a) => `<span style="width:${alloc[c.key][a.id]}%;background:${a.colour}"></span>`).join("");
+    const t = total(c.key), el = $("t_" + c.key);
+    el.className = "tot" + (t === 100 ? " ok" : t > 100 ? " over" : "");
+    el.innerHTML = `<span>${t === 100 ? "100% allocated" : t > 100 ? `${t}% - remove ${t - 100}%` : `${t}% allocated - ${100 - t}% left`}</span><span class="muted" style="font-weight:500">${c.n === 1 ? formatRand(STARTING_CAPITAL * Math.min(t, 100) / 100) + " of R1 000" : ""}</span>`;
+  });
+  validate(false);
+}
+$("chapters").addEventListener("input", (e) => {
+  if (e.target.type !== "range") return;
+  const box = e.target.closest(".asset"); alloc[box.dataset.k][box.dataset.id] = +e.target.value; renderAlloc();
+});
+$("chapters").addEventListener("click", (e) => {
+  const w = e.target.closest(".why");
+  if (w) { const x = w.closest(".asset").querySelector(".ex"); x.classList.toggle("hidden"); w.textContent = x.classList.contains("hidden") ? "What is this?" : "Hide"; return; }
+  const b = e.target.closest(".stp"); if (!b) return;
+  const box = b.closest(".asset"), k = box.dataset.k, id = box.dataset.id;
+  alloc[k][id] = Math.max(0, Math.min(100, alloc[k][id] + Number(b.dataset.d))); renderAlloc();
+});
+
+/* ---------- details ---------- */
+document.querySelectorAll('input[name="age"]').forEach((r) => r.addEventListener("change", () => { $("guardianBox").classList.toggle("hidden", !under18()); validate(false); }));
+const under18 = () => document.querySelector('input[name="age"]:checked')?.value === "yes";
+["fName", "fEmail", "fPhone", "fGuardian"].forEach((id) => $(id).addEventListener("input", () => validate(false)));
+["fGuardianOk", "fConsent", "fFinal"].forEach((id) => $(id).addEventListener("change", () => validate(false)));
+
+function problems() {
+  const p = [];
+  const name = $("fName").value.trim(), email = $("fEmail").value.trim(), phone = $("fPhone").value.replace(/[^\d+]/g, "");
+  if (name.length < 2) p.push("your full name");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) p.push("a valid email");
+  if (phone.replace(/\D/g, "").length < 9) p.push("a valid cellphone number");
+  if (!document.querySelector('input[name="age"]:checked')) p.push("whether you're under 18");
+  if (under18() && ($("fGuardian").value.trim().length < 2 || !$("fGuardianOk").checked)) p.push("your parent or guardian's name and consent");
+  COMP_CHAPTERS.forEach((c) => { if (total(c.key) !== 100) p.push(`chapter ${c.n} adding up to 100%`); });
+  if (!$("fConsent").checked || !$("fFinal").checked) p.push("the two tick boxes");
+  return p;
+}
+function validate(showAll) {
+  const p = problems(), m = $("dockMsg");
+  $("submitBtn").disabled = false;
+  if (!p.length) { m.className = "msg"; m.textContent = "All done - ready to submit"; return true; }
+  m.className = "msg" + (showAll ? " err" : ""); m.textContent = "Still needed: " + p.slice(0, 2).join(", ") + (p.length > 2 ? ` (+${p.length - 2} more)` : "");
+  return false;
+}
+
+$("submitBtn").addEventListener("click", async () => {
+  if (!validate(true)) return;
+  const btn = $("submitBtn"); btn.disabled = true; btn.textContent = "Submitting...";
+  const entry = {
+    name: $("fName").value.trim().slice(0, 60), email: $("fEmail").value.trim().toLowerCase().slice(0, 120),
+    phone: $("fPhone").value.trim().slice(0, 20), under18: under18(), consent: true,
+    alloc1: { ...alloc.alloc1 }, alloc2: { ...alloc.alloc2 },
+  };
+  if (entry.under18) { entry.guardianName = $("fGuardian").value.trim().slice(0, 60); entry.guardianConsent = true; }
+  try {
+    await backend.submitEntry(uid, entry);
+    try { localStorage.setItem("fpcComp:entered", "1"); } catch {}
+    done(entry);
+  } catch (e) {
+    console.error(e);
+    const existing = await backend.getMyEntry(uid);
+    if (existing) return done(existing, true);
+    $("dockMsg").className = "msg err"; $("dockMsg").textContent = "Couldn't submit. Entries may be closed - please try again.";
+    btn.disabled = false; btn.textContent = "Submit entry";
+  }
+});
+
+function summary(entry) {
+  return COMP_CHAPTERS.map((c) => `<div class="sum"><h3>Chapter ${c.n}: ${c.from} to ${c.to}</h3>${ASSETS.filter((a) => entry[c.key]?.[a.id] > 0).map((a) => `<div class="r"><span class="dot" style="background:${a.colour}"></span>${a.name}<span class="v">${entry[c.key][a.id]}%</span></div>`).join("")}</div>`).join("");
+}
+function done(entry, already) {
+  $("doneTitle").textContent = already ? "You've already entered" : "You're in!";
+  $("doneMsg").textContent = (already ? `We already have an entry from this device for ${entry.name || "you"}. ` : "Your entry has been received. ") + "Results will be announced after the competition closes. Good luck!";
+  $("doneSum").innerHTML = summary(entry);
+  show("sDone"); window.scrollTo(0, 0);
+}
+
+/* ---------- boot ---------- */
+(async () => {
+  $("videoLink").href = COMPETITION.videoUrl;
+  backend = await createCompBackend();
+  $("modeBadge").textContent = backend.mode === "live" ? "Live" : "Demo"; $("modeBadge").classList.add(backend.mode);
+  uid = await backend.signInEntrant();
+  const [c, mine] = await Promise.all([backend.getConfig(), backend.getMyEntry(uid)]);
+  cfg = c;
+  if (mine) return done(mine, true);
+  if (!cfg || !cfg.open) return show("sClosed");
+  renderAlloc(); show("sForm");
+})().catch((e) => { console.error(e); $("sLoad").innerHTML = '<p class="muted">Can\'t connect right now. Check your data or Wi-Fi and refresh this page.</p>'; });
+</script>
+</body>
+</html>

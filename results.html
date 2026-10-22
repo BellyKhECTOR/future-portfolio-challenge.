@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Competition Results - Admin</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .bar { padding: 12px 28px; } .bar .sp { flex: 1; }
+  main { max-width: 1280px; margin: 0 auto; padding: 26px 28px 60px; }
+  h1 { font-size: 32px; } h2 { font-size: 20px; margin-bottom: 6px; }
+  .muted { font-size: 14px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin-top: 20px; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .in { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font: inherit; }
+  .switch { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+  .switch input { width: 20px; height: 20px; accent-color: var(--gold); }
+  .rets { display: grid; grid-template-columns: 160px repeat(7, 1fr); gap: 8px; align-items: center; margin-top: 10px; }
+  .rets .h { font-size: 12px; color: var(--muted); text-align: center; }
+  .rets input { width: 100%; text-align: center; }
+  .stats { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+  .stat { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; min-width: 150px; }
+  .stat .v { font-family: var(--display); font-size: 26px; font-weight: 700; } .stat .l { font-size: 12px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding: 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.top3 td { background: rgba(195,155,83,.08); }
+  .rk { font-family: var(--display); font-weight: 700; font-size: 18px; }
+  .flag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--deep-red); color: #fff; margin-left: 6px; }
+  .flag.minor { background: var(--charcoal-navy-lighter); }
+  .mix { display: flex; height: 6px; border-radius: 3px; overflow: hidden; width: 120px; margin-top: 4px; }
+  .x { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; padding: 3px 8px; }
+  .gate { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(29,38,51,.96); text-align: center; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .ok { color: var(--green); font-weight: 600; } .bad { color: var(--red); font-weight: 600; }
+  @media (max-width: 900px) { .rets { grid-template-columns: 110px repeat(7, 1fr); } }
+</style>
+</head>
+<body>
+<div class="bar brandbar">
+  <img class="mazi" src="img/mazi-logo.svg" alt="Mazi Asset Management">
+  <span class="divider"></span>
+  <div class="title">Competition results - admin</div>
+  <img class="anniv" src="img/mazi-20-years.svg" alt="Mazi 20 years">
+  <span id="modeBadge" class="badge">...</span>
+  <div class="sp"></div>
+  <a class="btn ghost small" href="enter.html" target="_blank" rel="noopener">Open entry page</a>
+</div>
+
+<main>
+  <h1>Future Portfolio Challenge - online competition</h1>
+  <p class="muted">Only the presenter's Google account can see this page's data. Entries and returns are never shown to the public.</p>
+
+  <div class="panel">
+    <h2>1. Entries open or closed</h2>
+    <div class="row" style="margin-top:10px">
+      <label class="switch"><input type="checkbox" id="cOpen"> Accepting entries</label>
+      <button class="btn small" id="cSave">Save</button>
+      <span id="cStatus" class="muted"></span>
+    </div>
+    <p class="note">Tick and save to open entries; untick and save to close them. While closed, the entry page says entries aren't open and nothing can be submitted.</p>
+  </div>
+
+  <div class="panel">
+    <h2>2. Secret returns (% change over each 5-year chapter)</h2>
+    <p class="note">Kept private in the database. Set them before you open entries and don't change them afterwards.</p>
+    <div class="rets" id="rets"></div>
+    <div class="row" style="margin-top:12px"><button class="btn small" id="rSave">Save returns</button><span id="rStatus" class="muted"></span></div>
+  </div>
+
+  <div class="panel">
+    <div class="row"><h2 style="margin:0">3. Leaderboard</h2><div style="flex:1"></div>
+      <label class="switch"><input type="checkbox" id="hideDup" checked> Hide duplicates (keep earliest)</label>
+      <button class="btn small" id="csvBtn">Download CSV</button></div>
+    <div class="stats" id="stats"></div>
+    <div id="board"></div>
+  </div>
+</main>
+
+<div class="gate hidden" id="gate"><div>
+  <h2 style="font-size:28px">Admin sign-in</h2>
+  <p class="muted">Sign in with the presenter Google account.</p>
+  <button class="btn" id="signIn" style="margin-top:14px">Sign in with Google</button>
+  <p class="muted" id="gateErr"></p>
+</div></div>
+
+<script type="module">
+import { createCompBackend } from "./js/compbackend.js";
+import { COMP_CHAPTERS } from "./js/competition.js";
+import { ASSETS, STARTING_CAPITAL, portfolioValue, formatRand, formatPct } from "./js/scenarios.js";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let backend, secret = null, entries = [];
+
+/* returns form */
+$("rets").innerHTML = `<div></div>${ASSETS.map((a) => `<div class="h">${a.name}</div>`).join("")}` +
+  COMP_CHAPTERS.map((c, i) => `<div><b>Chapter ${c.n}</b><div class="note" style="margin:0">${c.from}-${c.to}</div></div>${ASSETS.map((a) => `<input class="in" type="number" step="1" id="r${i + 1}_${a.id}" placeholder="%">`).join("")}`).join("");
+function fillReturns() { [1, 2].forEach((n) => ASSETS.forEach((a) => { const v = secret?.["r" + n]?.[a.id]; $(`r${n}_${a.id}`).value = v ?? ""; })); }
+function readReturns() {
+  const out = { r1: {}, r2: {} }; let missing = 0;
+  [1, 2].forEach((n) => ASSETS.forEach((a) => { const v = $(`r${n}_${a.id}`).value; if (v === "") missing++; out["r" + n][a.id] = Number(v) || 0; }));
+  return { out, missing };
+}
+$("rSave").addEventListener("click", async () => {
+  const { out, missing } = readReturns();
+  if (missing && !confirm(`${missing} returns are blank and will be saved as 0%. Continue?`)) return;
+  try { await backend.setSecret(out); secret = out; $("rStatus").innerHTML = '<span class="ok">Saved</span>'; renderBoard(); }
+  catch (e) { console.error(e); $("rStatus").innerHTML = '<span class="bad">Could not save - are you signed in as the presenter?</span>'; }
+});
+
+/* config */
+$("cSave").addEventListener("click", async () => {
+  if ($("cOpen").checked && (!secret || !secret.r1)) { if (!confirm("You haven't saved the returns yet. Open entries anyway?")) return; }
+  try { await backend.setConfig({ open: $("cOpen").checked }); $("cStatus").innerHTML = `<span class="ok">Saved - ${$("cOpen").checked ? "entries are OPEN" : "entries are CLOSED"}</span>`; }
+  catch (e) { console.error(e); $("cStatus").innerHTML = '<span class="bad">Could not save - are you signed in as the presenter?</span>'; }
+});
+
+/* leaderboard */
+function scored() {
+  const r1 = secret?.r1, r2 = secret?.r2;
+  const list = entries.map((e) => {
+    const w1 = r1 ? portfolioValue(e.alloc1, r1, STARTING_CAPITAL) : null;
+    const w2 = r1 && r2 ? portfolioValue(e.alloc2, r2, w1) : null;
+    return { ...e, w1, w2 };
+  });
+  // duplicates by email or phone digits
+  const key = (s) => String(s || "").toLowerCase().replace(/\D/g, "").slice(-9);
+  const firstBy = new Map();
+  [...list].sort((a, b) => (a.submittedAt || 0) - (b.submittedAt || 0)).forEach((e) => {
+    for (const k of ["e:" + (e.email || "").toLowerCase(), "p:" + key(e.phone)]) {
+      if (k.length < 4) continue;
+      if (firstBy.has(k) && firstBy.get(k) !== e.uid) e.dup = true; else if (!firstBy.has(k)) firstBy.set(k, e.uid);
+    }
+  });
+  return list.sort((a, b) => (b.w2 ?? -1) - (a.w2 ?? -1) || (a.submittedAt || 0) - (b.submittedAt || 0));
+}
+function renderBoard() {
+  let list = scored();
+  if ($("hideDup").checked) list = list.filter((e) => !e.dup);
+  const ready = !!(secret?.r1 && secret?.r2);
+  const dups = scored().filter((e) => e.dup).length, minors = entries.filter((e) => e.under18).length;
+  $("stats").innerHTML = [["Entries", entries.length], ["Possible duplicates", dups], ["Under 18", minors],
+    ["Top value", ready && list[0] ? formatRand(list[0].w2) : "-"]].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  if (!entries.length) { $("board").innerHTML = '<p class="muted" style="margin-top:14px">No entries yet.</p>'; return; }
+  const mix = (a) => `<div class="mix">${ASSETS.map((x) => `<span style="width:${a?.[x.id] || 0}%;background:${x.colour}"></span>`).join("")}</div>`;
+  $("board").innerHTML = (ready ? "" : '<p class="note">Save the returns above to rank entries.</p>') + `<table><thead><tr>
+    <th>#</th><th>Name</th><th>Contact</th><th>Ch 1 / Ch 2 split</th><th class="num">2031</th><th class="num">2036</th><th class="num">Growth</th><th>Entered</th><th></th></tr></thead><tbody>${
+    list.map((e, i) => `<tr class="${ready && i < 3 ? "top3" : ""}">
+      <td class="rk">${ready ? i + 1 : "-"}</td>
+      <td>${esc(e.name)}${e.dup ? '<span class="flag">duplicate?</span>' : ""}${e.under18 ? `<span class="flag minor">under 18</span><div class="note" style="margin:2px 0 0">Guardian: ${esc(e.guardianName)}</div>` : ""}</td>
+      <td>${esc(e.email)}<div class="note" style="margin:2px 0 0">${esc(e.phone)}</div></td>
+      <td>${mix(e.alloc1)}${mix(e.alloc2)}</td>
+      <td class="num">${e.w1 != null ? formatRand(e.w1) : "-"}</td>
+      <td class="num"><b>${e.w2 != null ? formatRand(e.w2) : "-"}</b></td>
+      <td class="num">${e.w2 != null ? formatPct((e.w2 / STARTING_CAPITAL - 1) * 100) : "-"}</td>
+      <td class="note" style="margin:0">${e.submittedAt ? new Date(e.submittedAt).toLocaleString("en-ZA", { timeZone: "Africa/Johannesburg" }) : ""}</td>
+      <td><button class="x" data-uid="${esc(e.uid)}" title="Delete this entry">Delete</button></td></tr>`).join("")}</tbody></table>`;
+}
+$("hideDup").addEventListener("change", renderBoard);
+$("board").addEventListener("click", async (ev) => {
+  const b = ev.target.closest(".x"); if (!b) return;
+  if (!confirm("Permanently delete this entry?")) return;
+  try { await backend.deleteEntry(b.dataset.uid); } catch (e) { alert("Could not delete."); }
+});
+$("csvBtn").addEventListener("click", () => {
+  const list = scored(), q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const head = ["rank", "name", "email", "phone", "under18", "guardian", "possible_duplicate", "value_2031", "value_2036", "growth_pct", "submitted_sast",
+    ...ASSETS.map((a) => "ch1_" + a.id), ...ASSETS.map((a) => "ch2_" + a.id)];
+  const rows = list.map((e, i) => [e.w2 != null ? i + 1 : "", e.name, e.email, e.phone, e.under18 ? "yes" : "no", e.guardianName || "", e.dup ? "yes" : "",
+    e.w1 != null ? e.w1.toFixed(2) : "", e.w2 != null ? e.w2.toFixed(2) : "", e.w2 != null ? ((e.w2 / STARTING_CAPITAL - 1) * 100).toFixed(1) : "",
+    e.submittedAt ? new Date(e.submittedAt).toLocaleString("en-ZA", { timeZone: "Africa/Johannesburg" }) : "",
+    ...ASSETS.map((a) => e.alloc1?.[a.id] ?? ""), ...ASSETS.map((a) => e.alloc2?.[a.id] ?? "")]);
+  const csv = [head, ...rows].map((r) => r.map(q).join(",")).join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv" }));
+  a.download = `future-portfolio-challenge-results-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+});
+
+/* boot */
+(async () => {
+  backend = await createCompBackend();
+  $("modeBadge").textContent = backend.mode === "live" ? "Live" : "Demo mode"; $("modeBadge").classList.add(backend.mode);
+  let started = false;
+  const start = async () => {
+    if (started) return; started = true; $("gate").classList.add("hidden");
+    try {
+      const [cfg, sec] = await Promise.all([backend.getConfig(), backend.getSecret()]);
+      secret = sec; fillReturns();
+      if (cfg) { $("cOpen").checked = cfg.open; $("cStatus").textContent = cfg.open ? "Entries are OPEN" : "Entries are CLOSED"; }
+      else $("cStatus").textContent = "Not set up yet - entries are closed";
+    } catch (e) { console.error(e); $("cStatus").innerHTML = '<span class="bad">No access - sign in with the presenter account</span>'; }
+    backend.watchEntries((list) => { entries = list; renderBoard(); }, (e) => { console.error(e); $("board").innerHTML = '<p class="bad">No access to entries - sign in with the presenter account.</p>'; });
+  };
+  backend.onAdminChange((u) => { if (u) start(); else $("gate").classList.remove("hidden"); });
+  $("signIn").addEventListener("click", async () => { try { await backend.signInAdmin(); } catch (e) { $("gateErr").textContent = "Sign-in failed: " + (e.code || e.message); } });
+})();
+</script>
+</body>
+</html>

@@ -77,3 +77,22 @@ Rules of the journey:
 - The database rules only accept allocations of whole percentages that add up to exactly 100, only for the current round, and only while submissions are open.
 - Free-tier limits (50 000 reads and 20 000 writes a day) comfortably cover several classes of 40 learners.
 - Learners need mobile data or school Wi-Fi. The page is small (under 100 KB plus Firebase).
+
+
+## Online competition (video + entry page)
+
+A shareable version for the internet: one video, entries collected privately, results announced later.
+
+| File | What it is |
+|---|---|
+| `videos/competition.mp4` | The competition video (about 3 min 40 s, 1080p, 46 MB). Rules, Chapter 1 *The AI Boom* (2026-2031), Chapter 2 *The Great Slowdown* (2031-2036), then a full-screen QR code. A small QR code stays in the corner throughout. |
+| `enter.html` | The entry page the QR code opens: name, email, cellphone, under-18 question (with parent/guardian consent), POPIA consent, then the R1000 split for each chapter. One entry per device; entries can't be changed. No results are shown. |
+| `results.html` | The private organiser page (presenter Google account only): open/close entries, enter the secret returns, see the ranking, flag duplicates, delete entries, download a CSV. |
+
+How to run it:
+1. Publish the Firestore rules in `firestore.rules` (they include the competition rules).
+2. Open `results.html`, sign in, enter the two chapters' returns and press **Save returns**. They are stored privately in the database - never in the public code.
+3. Tick **Accepting entries** and press **Save**. Share the video.
+4. When the competition ends, untick and **Save** to close entries, then **Download CSV**. Duplicates (same email or phone) are flagged; only the earliest counts.
+
+Scoring: wealth in 2031 = R1000 x (sum of chapter 1 weights x (1 + return)); wealth in 2036 = wealth in 2031 x (sum of chapter 2 weights x (1 + return)). Highest 2036 value wins; ties go to the earlier entry.
